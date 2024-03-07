@@ -128,3 +128,14 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Deno / JSR
+deno.lock
+
+# NPM
+.npmrc
+package-lock.json
+package.json
+
+# Bun
+bunfig.toml

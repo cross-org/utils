@@ -15,8 +15,10 @@ version:
 ```bash
 # Deno
 deno add @cross/utils
+
 # Node
 npx jsr add @cross/utils
+
 # Bun
 bunx jsr add @cross/utils
 ```
@@ -25,7 +27,7 @@ bunx jsr add @cross/utils
 
 ### Exit
 
-```
+```js
 import { exit } from "@cross/utils";
 
 console.log("Will show");

@@ -3,9 +3,9 @@
   "version": "0.1.3",
   "exports": {
     ".": "./mod.ts",
-    "./ansi": "./ansi.ts",
-    "./args": "./args.ts",
-    "./exit": "./exit.ts"
+    "./ansi": "./utils/ansi.ts",
+    "./args": "./utils/args.ts",
+    "./exit": "./utils/exit.ts"
   },
   "imports": {
     "@cross/runtime": "jsr:@cross/runtime@^0.0.16",

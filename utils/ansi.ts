@@ -177,6 +177,78 @@ export class Colors {
   static bgWhite(text: string): string {
     return AnsiCodes.BgWhite + text + AnsiCodes.Reset;
   }
+
+  /**
+   * Sets the foreground color to black.
+   * @param {string} text The text to format.
+   * @returns {string} The formatted text.
+   */
+  static black(text: string): string {
+    return AnsiCodes.FgBlack + text + AnsiCodes.Reset;
+  }
+
+  /**
+   * Sets the foreground color to red.
+   * @param {string} text The text to format.
+   * @returns {string} The formatted text.
+   */
+  static red(text: string): string {
+    return AnsiCodes.FgRed + text + AnsiCodes.Reset;
+  }
+
+  /**
+   * Sets the foreground color to green.
+   * @param {string} text The text to format.
+   * @returns {string} The formatted text.
+   */
+  static green(text: string): string {
+    return AnsiCodes.FgGreen + text + AnsiCodes.Reset;
+  }
+
+  /**
+   * Sets the foreground color to yellow.
+   * @param {string} text The text to format.
+   * @returns {string} The formatted text.
+   */
+  static yellow(text: string): string {
+    return AnsiCodes.FgYellow + text + AnsiCodes.Reset;
+  }
+
+  /**
+   * Sets the foreground color to blue.
+   * @param {string} text The text to format.
+   * @returns {string} The formatted text.
+   */
+  static blue(text: string): string {
+    return AnsiCodes.FgBlue + text + AnsiCodes.Reset;
+  }
+
+  /**
+   * Sets the foreground color to magenta.
+   * @param {string} text The text to format.
+   * @returns {string} The formatted text.
+   */
+  static magenta(text: string): string {
+    return AnsiCodes.FgMagenta + text + AnsiCodes.Reset;
+  }
+
+  /**
+   * Sets the foreground color to cyan.
+   * @param {string} text The text to format.
+   * @returns {string} The formatted text.
+   */
+  static cyan(text: string): string {
+    return AnsiCodes.FgCyan + text + AnsiCodes.Reset;
+  }
+
+  /**
+   * Sets the foreground color to white.
+   * @param {string} text The text to format.
+   * @returns {string} The formatted text.
+   */
+  static white(text: string): string {
+    return AnsiCodes.FgWhite + text + AnsiCodes.Reset;
+  }
 }
 
 export class Cursor {

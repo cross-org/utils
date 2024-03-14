@@ -64,7 +64,21 @@ Provides methods for styling text in the console:
 
 ### Cursor
 
-Provides chainable methods for controlling the cursor in the console:
+Provides methods for controlling the cursor in the console, use together with
+`console.log`:
+
+```js
+console.log(Cursor.clearScreen());
+console.log("Hello!");
+```
+
+Or to re-use the previous row
+
+```js
+console.log("Hello");
+console.log(Cursor.up() + Cursor.clearLine() + "World!");
+// - Hello will be instantly overwritten, leaving only "World!"
+```
 
 - **Cursor.up(lines?: number): Cursor** - Moves the cursor up (default: 1 line).
 - **Cursor.down(lines?: number): Cursor** - Moves the cursor down (default: 1
@@ -92,7 +106,7 @@ const allArgs = args(true);
 console.log(Colors.bold(Colors.bgGreen("Hello, world!")));
 
 // Move the cursor and clear the line
-Cursor.up(2).clearLine();
+console.log(Cursor.up(2).clearLine());
 
 // If an unknown argument is passed, exit with an error
 if (!["hello", "goodbye"].includes(allArgs[1])) {

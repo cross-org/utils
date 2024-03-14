@@ -255,77 +255,68 @@ export class Cursor {
   /**
    * Moves the cursor up a specified number of lines.
    * @param {number} lines The number of lines to move up (default: 1).
-   * @returns {Cursor} Returns the current Cursor instance.
+   * @returns {string} Returns a string with the control character.
    */
-  static up(lines: number = 1): Cursor {
-    console.log(`\x1b[${lines}A`);
-    return this;
+  static up(lines: number = 1): string {
+    return `\x1b[${lines}A`;
   }
 
   /**
    * Moves the cursor down a specified number of lines.
    * @param {number} lines The number of lines to move down (default: 1).
-   * @returns {Cursor} Returns the current Cursor instance.
+   * @returns {string} Returns a string with the control character.
    */
-  static down(lines: number = 1): Cursor {
-    console.log(`\x1b[${lines}B`);
-    return this;
+  static down(lines: number = 1): string {
+    return `\x1b[${lines}B`;
   }
 
   /**
    * Moves the cursor right a specified number of columns.
    * @param {number} columns The number of columns to move right (default: 1).
-   * @returns {Cursor} Returns the current Cursor instance.
    */
-  static right(columns: number = 1): Cursor {
-    console.log(`\x1b[${columns}C`);
-    return this;
+  static right(columns: number = 1): string {
+    return `\x1b[${columns}C`;
   }
 
   /**
    * Moves the cursor left a specified number of columns.
    * @param {number} columns The number of columns to move left (default: 1).
-   * @returns {Cursor} Returns the current Cursor instance.
+   * @returns {string} Returns a string with the control character.
    */
-  static left(columns: number = 1): Cursor {
-    console.log(`\x1b[${columns}D`);
-    return this;
+  static left(columns: number = 1): string {
+    return `\x1b[${columns}D`;
   }
 
   /**
    * Hides the cursor.
-   * @returns {Cursor} Returns the current Cursor instance.
+   * @returns {string} Returns a string with the control character.
    */
-  static hide(): Cursor {
-    console.log("\x1b[?25l");
-    return this;
+  static hide(): string {
+    return "\x1b[?25l";
   }
 
   /**
    * Shows the cursor.
-   * @returns {Cursor} Returns the current Cursor instance.
+   * @returns {string} Returns a string with the control character.
    */
-  static show(): Cursor {
-    console.log("\x1b[?25h");
-    return this;
+  static show(): string {
+    return "\x1b[?25h";
   }
 
   /**
    * Clears the entire screen.
-   * @returns {Cursor} Returns the current Cursor instance.
+   * @returns {string} Returns a string with the control character.
    */
-  static clearScreen(): Cursor {
-    console.log("\x1b[2J\x1b[0;0H");
-    return this;
+  static clearScreen(): string {
+    return "\x1b[2J\x1b[0;0H";
   }
 
   /**
    * Clears the current line.
-   * @returns {Cursor} Returns the current Cursor instance.
+   * @returns {string} Returns a string with the control character.
    */
-  static clearLine(): Cursor {
-    console.log("\x1b[K");
-    return this;
+  static clearLine(): string {
+    return "\x1b[K";
   }
 
   /**
@@ -335,8 +326,7 @@ export class Cursor {
    * @returns {Cursor} Returns the current Cursor instance.
    */
   static moveTo(x: number, y: number): Cursor {
-    console.log(`\x1b[${y + 1};${x + 1}H`);
-    return this;
+    return `\x1b[${y + 1};${x + 1}H`;
   }
 }
 

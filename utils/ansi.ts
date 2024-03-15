@@ -1,5 +1,11 @@
 /**
+ * This module provides utilities for styling console output and manipulating the cursor, including
+ * ANSI color codes, text formatting, cursor movement and screen clearing.
+ */
+
+/**
  * ANSI escape codes for styling text.
+ * @private
  */
 const enum AnsiCodes {
   Reset = "\x1b[0m",
@@ -31,6 +37,10 @@ const enum AnsiCodes {
 }
 
 export class Colors {
+  /**
+   * Contains methods for applying various ANSI text styles to console output.
+   */
+
   /**
    * Applies bold formatting to text.
    * @param {string} text The text to format.
@@ -252,6 +262,11 @@ export class Colors {
 }
 
 export class Cursor {
+  /**
+   * Contains methods for controlling cursor behavior in the console, like movement, visibility,
+   * or clearing the screen.
+   */
+
   /**
    * Moves the cursor up a specified number of lines.
    * @param {number} lines The number of lines to move up (default: 1).

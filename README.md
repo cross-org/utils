@@ -118,3 +118,60 @@ if (!["hello", "goodbye"].includes(allArgs[1])) {
 const userInput = stripAnsi(await prompt("Enter some text: "));
 console.log("You entered (without formatting):", userInput);
 ```
+
+### ArgsParser
+
+Parses command-line arguments in a cross-runtime compatible manner.
+
+**Methods**
+
+- **ArgsParser.parseArgs(cmdArgs: string[]): { args: Record<string, string |
+  boolean | string[]>, loose: string[] }**
+
+  Parses a given array of command-line arguments.
+
+  - **cmdArgs:** An array of command-line arguments.
+
+  - **Returns:** An object with the following properties:
+    - **args:** An object where keys represent argument names, and values are
+      the corresponding values. Values can be strings, booleans, or arrays of
+      strings (for flags that occur multiple times).
+    - **loose:** An array of any arguments that were not part of named flags
+      (positional arguments).
+
+- **getArray(argName: string): string[]** Retrieves an array of values
+  associated with a given argument name. Returns an empty array if the argument
+  is not found.
+
+- **get(argName: string): string | boolean | undefined** Retrieves the first
+  value associated with a given argument name, or `undefined` if the argument is
+  not found.
+
+- **count(argName: string): number** Counts the occurrences of a given argument
+  name (0 if not found).
+
+- **getLooseArgs(): string[]** Returns an array of loose (positional) arguments.
+
+- **countLooseArgs(): number** Counts the number of loose (positional)
+  arguments.
+
+**Example Usage:**
+
+```javascript
+import { ArgsParser } from "@cross/utils";
+
+const cmdArgs = [
+  "--port",
+  "8080",
+  "-v",
+  "--configFile",
+  "app.config",
+  "file.txt",
+];
+const parser = new ArgsParser(cmdArgs);
+
+console.log(parser.getArray("v")); // Output: [true, true] (if -v flag appeared multiple times)
+console.log(parser.get("port")); // Output: "8080"
+console.log(parser.count("config")); // Output: 1
+console.log(parser.getLooseArgs()); // Output: ["file.txt"]
+```

@@ -1,12 +1,12 @@
 {
   "name": "@cross/utils",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "exports": {
     ".": "./mod.ts",
     "./ansi": "./utils/ansi.ts",
     "./args": "./utils/args.ts",
     "./exit": "./utils/exit.ts",
-    "./exec": "./utils/exec.ts"
+    "./spawn": "./utils/spawn.ts"
   },
   "imports": {
     "@cross/runtime": "jsr:@cross/runtime@^0.0.17",

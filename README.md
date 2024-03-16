@@ -1,213 +1,145 @@
-# @cross/utils
+Absolutely! Here's your reworked README in a refined format, along with some
+additional suggestions to make it even more compelling:
 
-A collection of useful routines to simplify cross-runtime (Node, Deno, and Bun)
-development.
+**@cross/utils**
 
-Available for Node, Deno, Bun and Browser at
-[jsr.io/@cross/utils](https://jsr.io/@cross/utils), and works seamlessly with
-both JavaScript and TypeScript.
+A collection of useful routines to simplify cross-runtime (Node.js, Deno, and
+Bun) development.
 
-## Installation
+**Installation**
 
-Full instructions available at [jsr.io](https://jsr.io/@cross/utils), short
+Get started quickly with @cross/utils. Full instructions and symbol
+documentation are available at
+[https://jsr.io/@cross/utils](https://jsr.io/@cross/utils), but here's the short
 version:
 
 ```bash
 # Deno
-deno add @cross/utils
+deno add https://jsr.io/@cross/utils
 
-# Node
+# Node.js
 npx jsr add @cross/utils
 
 # Bun
 bunx jsr add @cross/utils
 ```
 
-## Methods
+Absolutely! Here's how you can restructure your README to emphasize the four
+submodules and guide users towards exploring them individually:
 
-- **exit(code?: number): void** Terminates the current process with a provided
-  exit code (defaults to 0).
+**@cross/utils**
 
-- **args(all?: boolean): string[]** Extracts command-line arguments in a
-  cross-runtime compatible manner.
-  - `all` (optional): If true, includes the executable path and script name.
+A collection of cross-runtime JavaScript utilities for Node.js, Deno, and Bun.
 
-- **stripAnsi(text: string): string** Removes all ANSI control codes from a
-  given string.
+**Installation**
 
-## Classes
+Get started quickly with @cross/utils. Full instructions are available at
+[https://jsr.io/@cross/utils](https://jsr.io/@cross/utils), but here's the short
+version:
 
-### Colors
+```bash
+# Deno
+deno add https://jsr.io/@cross/utils
 
-Provides methods for styling text in the console:
+# Node.js
+npx jsr add @cross/utils
 
-- **Colors.bold(text: string): string** - Applies bold formatting.
-- **Colors.dim(text: string): string** - Applies dim formatting.
-- **Colors.italic(text: string): string** - Applies italic formatting.
-- **Colors.underline(text: string): string** - Applies underline formatting.
-- **Colors.inverse(text: string): string** - Applies inverse formatting.
-- **Colors.hidden(text: string): string** - Applies hidden formatting.
-- **Colors.strikethrough(text: string): string** - Applies strikethrough
-  formatting.
-- **Colors.rgb(r: number, g: number, b: number, text: string): string** - Sets
-  the foreground color using 24-bit RGB values.
-- **Colors.bgBlack(text: string): string** - Sets the background color to black.
-- **Colors.bgRed(text: string): string** - Sets the background color to red.
-- **Colors.bgGreen(text: string): string** - Sets the background color to green.
-- **Colors.bgYellow(text: string): string** - Sets the background color to
-  yellow.
-- **Colors.bgBlue(text: string): string** - Sets the background color to blue.
-- **Colors.bgMagenta(text: string): string** - Sets the background color to
-  magenta.
-- **Colors.bgCyan(text: string): string** - Sets the background color to cyan.
-- **Colors.bgWhite(text: string): string** - Sets the background color to white.
-
-### Cursor
-
-Provides methods for controlling the cursor in the console, use together with
-`console.log`:
-
-```js
-console.log(Cursor.clearScreen());
-console.log("Hello!");
+# Bun
+bunx jsr add @cross/utils
 ```
 
-Or to re-use the previous row
-
-```js
-console.log("Hello");
-console.log(Cursor.up() + Cursor.clearLine() + "World!");
-// - Hello will be instantly overwritten, leaving only "World!"
-```
-
-- **Cursor.up(lines?: number): Cursor** - Moves the cursor up (default: 1 line).
-- **Cursor.down(lines?: number): Cursor** - Moves the cursor down (default: 1
-  line).
-- **Cursor.right(columns?: number): Cursor** - Moves the cursor right (default:
-  1 column).
-- **Cursor.left(columns?: number): Cursor** - Moves the cursor left (default: 1
-  column).
-- **Cursor.hide(): Cursor** - Hides the cursor.
-- **Cursor.show(): Cursor** - Shows the cursor.
-- **Cursor.clearScreen(): Cursor** - Clears the entire screen.
-- **Cursor.clearLine(): Cursor** - Clears the current line.
-- **Cursor.moveTo(x: number, y: number): Cursor** - Moves the cursor to a
-  specific position.
-
-## Example Usage
-
-```javascript
-import { args, Colors, Cursor, exit, stripAnsi } from "@cross/utils";
-
-// Get all command-line arguments
-const allArgs = args(true);
-
-// Color some output
-console.log(Colors.bold(Colors.bgGreen("Hello, world!")));
-
-// Move the cursor and clear the line
-console.log(Cursor.up(2).clearLine());
-
-// If an unknown argument is passed, exit with an error
-if (!["hello", "goodbye"].includes(allArgs[1])) {
-  console.log(Colors.red("Invalid argument"));
-  exit(1);
-}
-
-// Remove ANSI codes from input for clean logging
-const userInput = stripAnsi(await prompt("Enter some text: "));
-console.log("You entered (without formatting):", userInput);
-```
-
-### ArgsParser
-
-Parses command-line arguments in a cross-runtime compatible manner.
+**Core Utilities**
 
 **Methods**
 
-- **ArgsParser.parseArgs(cmdArgs: string[]): { args: Record<string, string |
-  boolean | string[]>, loose: string[] }**
+- **exit(code?: number): void**
+  - Terminates the current process with the provided exit code (defaults to 0).
+    Works seamlessly across runtimes.
 
-  Parses a given array of command-line arguments.
+- **args(all?: boolean): string[]**
+  - Extracts command-line arguments in a consistent way across Node.js, Deno,
+    and Bun.
+  - `all` (optional): If true, includes the executable path and script name.
 
-  - **cmdArgs:** An array of command-line arguments.
+- **stripAnsi(text: string): string**
+  - Removes all ANSI control codes from a string for cleaner logs and output.
 
-  - **Returns:** An object with the following properties:
-    - **args:** An object where keys represent argument names, and values are
-      the corresponding values. Values can be strings, booleans, or arrays of
-      strings (for flags that occur multiple times).
-    - **loose:** An array of any arguments that were not part of named flags
-      (positional arguments).
+**Classes**
 
-- **getArray(argName: string): string[]** Retrieves an array of values
-  associated with a given argument name. Returns an empty array if the argument
-  is not found.
+- **Colors**
+  - Provides methods for styling text in the console for all supported runtimes.
+  - Example: `console.log(Colors.bold(Colors.bgGreen("Success!")));`
 
-- **get(argName: string): string | boolean | undefined** Retrieves the first
-  value associated with a given argument name, or `undefined` if the argument is
-  not found.
+- **Cursor**
+  - Methods for controlling the cursor in the console, enabling more interactive
+    CLI experiences across environments.
+  - Example: `console.log(Cursor.hide() + "Secret Text" + Cursor.show());`
 
-- **count(argName: string): number** Counts the occurrences of a given argument
-  name (0 if not found).
+- **ArgsParser**
+  - Parses command-line arguments in a standardized way, supporting named flags,
+    multiple values, and positional arguments.
 
-- **getLooseArgs(): string[]** Returns an array of loose (positional) arguments.
-
-- **countLooseArgs(): number** Counts the number of loose (positional)
-  arguments.
-
-**Example Usage:**
-
-```javascript
-import { ArgsParser } from "@cross/utils";
-
-const cmdArgs = [
-  "--port",
-  "8080",
-  "-v",
-  "--configFile",
-  "app.config",
-  "file.txt",
-];
-const parser = new ArgsParser(cmdArgs);
-
-console.log(parser.getArray("v")); // Output: [true, true] (if -v flag appeared multiple times)
-console.log(parser.get("port")); // Output: "8080"
-console.log(parser.count("config")); // Output: 1
-console.log(parser.getLooseArgs()); // Output: ["file.txt"]
-```
-
-## exec
+**Advanced Tooling**
 
 - **exec(command: CommandArray, extraEnvVars?: Record<string, string>, cwd?:
-  string):** Executes a shell command in the current runtime environment
-  (Node.js, Deno, or Bun).
-  - **Parameters**
-    - **command:** An array of strings representing the command and its
-      arguments.
-    - **extraEnvVars (optional):** An object containing additional environment
-      variables to set for the command.
-    - **cwd (optional):** A path specifying the current working directory for
-      the command.
-  - **Returns:** A Promise resolving with an object containing:
-    - **code:** The exit code of the executed command.
-    - **stdout:** The standard output of the command.
-    - **stderr:** The standard error of the command.
-  - **Throws:** An Error if the current runtime is not supported.
+  string): Promise<{ code: number; stdout: string; stderr: string }>**
+  - Executes shell commands in all supported runtimes (Node.js, Deno, Bun),
+    providing flexibility for complex interactions.
 
-### Example
+**Example Usage**
 
-```js
-import { exec } from "@cross/utils";
+```javascript
+import {
+  args,
+  ArgsParser,
+  Colors,
+  Cursor,
+  exit,
+  spawn,
+  stripAnsi,
+} from "@cross/utils";
 
-// Example using `exec`
-const command = ["/bin/bash", "-c", 'echo "running a shell"'];
+// Argument processing
+const parser = new ArgsParser(args(true));
+const port = parser.get("port") || "8080";
 
-try {
-  const result = await exec(command, { HOME: "/home/newuser" });
-  console.log("Return Code:", result.code);
-  console.log("Stdout:", result.stdout);
-  console.log("Stderr:", result.stderr);
-} catch (error) {
-  console.error(error);
-}
+// Colorful output
+console.log(Colors.bold(Colors.bgGreen("Server starting on port " + port)));
+
+// User input with cleaned logging
+const input = stripAnsi(await prompt("Enter text: "));
+console.log("Input (no formatting):", input);
+
+// Interactive prompt replacement
+console.log("Doing work...");
+console.log(Cursor.up(1) + Cursor.clearLine() + "Work complete!");
+
+// Execute a shell command (e.g., 'git status')
+const cmdResult = await spawn(["git", "status"]);
+console.log(cmdResult.stdout);
 ```
+
+**Submodules**
+
+The @cross/utils package is organized into the following submodules for focused
+functionality:
+
+- **@cross/utils/ansi**
+  - **stripAnsi(text: string): string** - Removes ANSI control codes for cleaner
+    output.
+  - **Colors Class** - Provides methods for easy console text styling.
+
+- **@cross/utils/spawn**
+  - **exec(command: CommandArray, extraEnvVars?: Record<string, string>, cwd?:
+    string): Promise<{ code: number; stdout: string; stderr: string }>** -
+    Executes shell commands in a cross-runtime manner.
+
+- **@cross/utils/args**
+  - **args(all?: boolean): string[]** - Fetches command-line arguments
+    consistently across environments.
+  - **ArgsParser Class** - Advanced parsing of command-line arguments with flag
+    and value support.
+
+- **@cross/utils/exit**
+  - **exit(code?: number): void** - Terminates the process with control over the
+    exit code.

@@ -3,7 +3,7 @@ import { CurrentRuntime, Runtime } from "@cross/runtime";
 type CommandArray = string[];
 
 // Runtime-specific execution functions (also using async/await)
-async function executeNode(
+async function spawnNodeChildProcess(
   command: CommandArray,
   env: Record<string, string> = {},
   cwd?: string,
@@ -36,7 +36,7 @@ async function executeNode(
   });
 }
 
-async function executeDeno(
+async function spawnDenoChildProcess(
   command: CommandArray,
   env: Record<string, string> = {},
   cwd?: string,
@@ -56,7 +56,7 @@ async function executeDeno(
   };
 }
 
-async function executeBun(
+async function spawnBunChildProcess(
   command: CommandArray,
   extraEnvVars: Record<string, string> = {},
   cwd?: string,
@@ -103,7 +103,7 @@ async function executeBun(
  * const command = ["/bin/bash", "-c", "echo \"running a shell\""];
  *
  * try {
- *   const result = await exec(command, { HOME: "/home/overridden/home/dir" });
+ *   const result = await spawn(command, { HOME: "/home/overridden/home/dir" });
  *   console.log("Return Code:", result.code);
  *   console.log("Stdout:", result.stdout);
  *   console.log("Stderr:", result.stderr);
@@ -111,18 +111,18 @@ async function executeBun(
  *   console.error(error);
  * }
  */
-export async function exec(
+export async function spawn(
   command: CommandArray,
   extraEnvVars: Record<string, string> = {},
   cwd?: string,
 ): Promise<{ code: number; stdout: string; stderr: string }> {
   switch (CurrentRuntime) {
     case Runtime.Node:
-      return await executeNode(command, extraEnvVars, cwd);
+      return await spawnNodeChildProcess(command, extraEnvVars, cwd);
     case Runtime.Deno:
-      return await executeDeno(command, extraEnvVars, cwd);
+      return await spawnDenoChildProcess(command, extraEnvVars, cwd);
     case Runtime.Bun:
-      return await executeBun(command, extraEnvVars, cwd);
+      return await spawnBunChildProcess(command, extraEnvVars, cwd);
     default:
       throw new Error(`Unsupported runtime: ${CurrentRuntime}`);
   }

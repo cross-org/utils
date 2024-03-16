@@ -175,3 +175,39 @@ console.log(parser.get("port")); // Output: "8080"
 console.log(parser.count("config")); // Output: 1
 console.log(parser.getLooseArgs()); // Output: ["file.txt"]
 ```
+
+## exec
+
+- **exec(command: CommandArray, extraEnvVars?: Record<string, string>, cwd?:
+  string):** Executes a shell command in the current runtime environment
+  (Node.js, Deno, or Bun).
+  - **Parameters**
+    - **command:** An array of strings representing the command and its
+      arguments.
+    - **extraEnvVars (optional):** An object containing additional environment
+      variables to set for the command.
+    - **cwd (optional):** A path specifying the current working directory for
+      the command.
+  - **Returns:** A Promise resolving with an object containing:
+    - **code:** The exit code of the executed command.
+    - **stdout:** The standard output of the command.
+    - **stderr:** The standard error of the command.
+  - **Throws:** An Error if the current runtime is not supported.
+
+### Example
+
+```js
+import { exec } from "@cross/utils";
+
+// Example using `exec`
+const command = ["/bin/bash", "-c", 'echo "running a shell"'];
+
+try {
+  const result = await exec(command, { HOME: "/home/newuser" });
+  console.log("Return Code:", result.code);
+  console.log("Stdout:", result.stdout);
+  console.log("Stderr:", result.stderr);
+} catch (error) {
+  console.error(error);
+}
+```

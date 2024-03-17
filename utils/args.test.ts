@@ -14,6 +14,7 @@ test("Parse arguments using space as separator", () => {
       configFile: ["app.config"],
     },
     loose: [],
+    rest: "",
   });
 });
 
@@ -26,6 +27,7 @@ test("Parse arguments using equal sign as separator", () => {
       arg: ["asd"],
     },
     loose: [],
+    rest: "",
   });
 });
 
@@ -39,6 +41,7 @@ test("Handle flags with no values", () => {
       debug: [true],
     },
     loose: [],
+    rest: "",
   });
 });
 
@@ -51,6 +54,7 @@ test("Handle an argument at the end", () => {
       port: ["8080"],
     },
     loose: ["app.config"],
+    rest: "",
   });
 });
 
@@ -63,6 +67,7 @@ test("Handle empty arguments", () => {
       flag: [""],
     },
     loose: [],
+    rest: "",
   });
 });
 
@@ -75,6 +80,7 @@ test("Handle arguments with embedded equals signs", () => {
       path: ["/my/path=with/equals"],
     },
     loose: [],
+    rest: "",
   });
 });
 
@@ -88,6 +94,7 @@ test("Handle multiple occurrences of a flag", () => {
       config: ["prod.config"],
     },
     loose: [],
+    rest: "",
   });
 });
 
@@ -110,4 +117,55 @@ test("Test ArgsParser methods", () => {
 
   // Add a method to get loose arguments for completeness (optional)
   assertEquals(parser.getLoose(), ["file.txt"]);
+});
+
+test("Handle everything after '--' as the rest command", () => {
+  const cmdArgs = ["--port", "8080", "--", "run", "server", "--debug"];
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs);
+
+  assertEquals(parsedArgs, {
+    args: {
+      port: ["8080"],
+    },
+    loose: [],
+    rest: "run server --debug",
+  });
+
+  const parser = new ArgsParser(cmdArgs);
+  assertEquals(parser.getRest(), "run server --debug");
+  assertEquals(parser.hasRest(), true);
+});
+
+test("Handle multiple '--' delimiters", () => {
+  const cmdArgs = ["--flag", "--", "start", "--", "build"];
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs);
+
+  assertEquals(parsedArgs, {
+    args: {
+      flag: [true],
+    },
+    loose: [],
+    rest: "start -- build",
+  });
+
+  const parser = new ArgsParser(cmdArgs);
+  assertEquals(parser.getRest(), "start -- build");
+  assertEquals(parser.hasRest(), true);
+});
+
+test("Handle the '--' delimiter at the end", () => {
+  const cmdArgs = ["--flag", "--"];
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs);
+
+  assertEquals(parsedArgs, {
+    args: {
+      flag: [true],
+    },
+    loose: [],
+    rest: "",
+  });
+
+  const parser = new ArgsParser(cmdArgs);
+  assertEquals(parser.getRest(), "");
+  assertEquals(parser.hasRest(), false);
 });

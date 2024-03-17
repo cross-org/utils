@@ -46,6 +46,7 @@ export function args(all: boolean = false): string[] {
 export class ArgsParser {
   private readonly parsedArgs: Record<string, (string | boolean)[]>;
   private readonly looseArgs: string[];
+  private readonly restCommand: string = "";
 
   /**
    * Parses command-line arguments.
@@ -58,13 +59,23 @@ export class ArgsParser {
    */
   public static parseArgs(
     cmdArgs: string[],
-  ): { args: Record<string, (string | boolean)[]>; loose: string[] } {
+  ): {
+    args: Record<string, (string | boolean)[]>;
+    loose: string[];
+    rest: string;
+  } {
     const parsedArgs: Record<string, (string | boolean)[]> = {};
     const looseArgs: string[] = [];
-
+    let restCommand = "";
+    let collectingRest = false;
     for (let i = 0; i < cmdArgs.length; i++) {
       const arg = cmdArgs[i];
-      if (arg.startsWith("--") || arg.startsWith("-")) {
+
+      if (collectingRest) {
+        restCommand += (restCommand ? " " : "") + arg; // Join with spaces
+      } else if (arg === "--") {
+        collectingRest = true;
+      } else if (arg.startsWith("--") || arg.startsWith("-")) {
         const parts = arg.slice(arg.startsWith("--") ? 2 : 1).split("=");
         const key = parts[0];
         let value: string | boolean = true; // Default to boolean for flags
@@ -90,13 +101,14 @@ export class ArgsParser {
       }
     }
 
-    return { args: parsedArgs, loose: looseArgs };
+    return { args: parsedArgs, loose: looseArgs, rest: restCommand };
   }
 
   constructor(cmdArgs: string[]) {
     const result = ArgsParser.parseArgs(cmdArgs);
     this.parsedArgs = result.args;
     this.looseArgs = result.loose;
+    this.restCommand = result.rest;
   }
 
   /**
@@ -145,5 +157,21 @@ export class ArgsParser {
    */
   countLoose(): number {
     return this.looseArgs.length;
+  }
+
+  /**
+   * Returns the remaining command portion collected after the "--" delimiter.
+   * @returns {string} The rest of the command.
+   */
+  getRest(): string {
+    return this.restCommand;
+  }
+
+  /**
+   * Checks whether a command portion was collected after the "--" delimiter.
+   * @returns {boolean} True if a rest command exists, false otherwise.
+   */
+  hasRest(): boolean {
+    return this.restCommand !== "";
   }
 }

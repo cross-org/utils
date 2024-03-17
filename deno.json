@@ -1,6 +1,6 @@
 {
   "name": "@cross/utils",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "exports": {
     ".": "./mod.ts",
     "./ansi": "./utils/ansi.ts",

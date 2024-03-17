@@ -26,5 +26,3 @@ export function cwd(): string {
     );
   }
 }
-
-console.log(cwd());

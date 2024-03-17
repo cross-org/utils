@@ -4,6 +4,7 @@ import { CurrentRuntime, Runtime } from "@cross/runtime";
  * Terminates the current process in a cross-runtime compatible manner.
  *
  * @param {number} code - Optional exit code (defaults to 0).
+ * @throws
  * @example
  * // import { exit } from "@cross/utils";
  *
@@ -23,6 +24,8 @@ export function exit(code = 0) {
     // @ts-ignore Cross Runtime
     process.exit(code);
   } else {
-    console.error("Cannot determine runtime. Exit functionality unavailable.");
+    throw new Error(
+      "Cannot determine runtime. Exit functionality unavailable.",
+    );
   }
 }

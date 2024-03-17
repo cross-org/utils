@@ -1,39 +1,10 @@
-Absolutely! Here's your reworked README in a refined format, along with some
-additional suggestions to make it even more compelling:
-
-**@cross/utils**
-
-A collection of useful routines to simplify cross-runtime (Node.js, Deno, and
-Bun) development.
-
-**Installation**
-
-Get started quickly with @cross/utils. Full instructions and symbol
-documentation are available at
-[https://jsr.io/@cross/utils](https://jsr.io/@cross/utils), but here's the short
-version:
-
-```bash
-# Deno
-deno add https://jsr.io/@cross/utils
-
-# Node.js
-npx jsr add @cross/utils
-
-# Bun
-bunx jsr add @cross/utils
-```
-
-Absolutely! Here's how you can restructure your README to emphasize the four
-submodules and guide users towards exploring them individually:
-
 **@cross/utils**
 
 A collection of cross-runtime JavaScript utilities for Node.js, Deno, and Bun.
 
 **Installation**
 
-Get started quickly with @cross/utils. Full instructions are available at
+Full instructions are available at
 [https://jsr.io/@cross/utils](https://jsr.io/@cross/utils), but here's the short
 version:
 
@@ -54,15 +25,19 @@ bunx jsr add @cross/utils
 
 - **exit(code?: number): void**
   - Terminates the current process with the provided exit code (defaults to 0).
-    Works seamlessly across runtimes.
 
 - **args(all?: boolean): string[]**
-  - Extracts command-line arguments in a consistent way across Node.js, Deno,
-    and Bun.
+  - Extracts command-line arguments.
   - `all` (optional): If true, includes the executable path and script name.
 
 - **stripAnsi(text: string): string**
   - Removes all ANSI control codes from a string for cleaner logs and output.
+
+- **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string)**
+  - Spawns a sub process.
+
+- **cwd()**
+  - Returns the current working directory.
 
 **Classes**
 
@@ -78,13 +53,6 @@ bunx jsr add @cross/utils
 - **ArgsParser**
   - Parses command-line arguments in a standardized way, supporting named flags,
     multiple values, and positional arguments.
-
-**Advanced Tooling**
-
-- **exec(command: CommandArray, extraEnvVars?: Record<string, string>, cwd?:
-  string): Promise<{ code: number; stdout: string; stderr: string }>**
-  - Executes shell commands in all supported runtimes (Node.js, Deno, Bun),
-    providing flexibility for complex interactions.
 
 **Example Usage**
 
@@ -130,9 +98,8 @@ functionality:
   - **Colors Class** - Provides methods for easy console text styling.
 
 - **@cross/utils/spawn**
-  - **exec(command: CommandArray, extraEnvVars?: Record<string, string>, cwd?:
-    string): Promise<{ code: number; stdout: string; stderr: string }>** -
-    Executes shell commands in a cross-runtime manner.
+  - **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string):
+    Promise<>** - Spawns subprocesses in a cross-runtime manner.
 
 - **@cross/utils/args**
   - **args(all?: boolean): string[]** - Fetches command-line arguments
@@ -143,3 +110,6 @@ functionality:
 - **@cross/utils/exit**
   - **exit(code?: number): void** - Terminates the process with control over the
     exit code.
+
+- **@cross/utils/cwd**
+  - **cwd(): string** - Returns current working directory.

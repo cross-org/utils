@@ -10,7 +10,7 @@ version:
 
 ```bash
 # Deno
-deno add https://jsr.io/@cross/utils
+deno add @cross/utils
 
 # Node.js
 npx jsr add @cross/utils

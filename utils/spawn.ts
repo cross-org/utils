@@ -1,10 +1,9 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
 
-type CommandArray = string[];
 
 // Runtime-specific execution functions (also using async/await)
 async function spawnNodeChildProcess(
-  command: CommandArray,
+  command: string[],
   env: Record<string, string> = {},
   cwd?: string,
 ): Promise<{ code: number; stdout: string; stderr: string }> {
@@ -37,7 +36,7 @@ async function spawnNodeChildProcess(
 }
 
 async function spawnDenoChildProcess(
-  command: CommandArray,
+  command: string[],
   env: Record<string, string> = {},
   cwd?: string,
 ): Promise<{ code: number; stdout: string; stderr: string }> {
@@ -57,7 +56,7 @@ async function spawnDenoChildProcess(
 }
 
 async function spawnBunChildProcess(
-  command: CommandArray,
+  command: string[],
   extraEnvVars: Record<string, string> = {},
   cwd?: string,
 ): Promise<{ code: number; stdout: string; stderr: string }> {
@@ -89,7 +88,7 @@ async function spawnBunChildProcess(
 /**
  * Starts a child processes.
  *
- * @param {CommandArray} command - An array of strings representing the command and its arguments.
+ * @param {string[]} command - An array of strings representing the command and its arguments.
  * @param {Record<string, string>} [extraEnvVars] - An optional object containing additional environment variables to set for the command.
  * @param {string} [cwd] - An optional path specifying the current working directory for the command.
  * @returns {Promise<{ code: number; stdout: string; stderr: string }>} A Promise resolving with an object containing:
@@ -112,7 +111,7 @@ async function spawnBunChildProcess(
  * }
  */
 export async function spawn(
-  command: CommandArray,
+  command: string[],
   extraEnvVars: Record<string, string> = {},
   cwd?: string,
 ): Promise<{ code: number; stdout: string; stderr: string }> {

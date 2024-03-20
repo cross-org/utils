@@ -1,6 +1,5 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
 
-
 // Runtime-specific execution functions (also using async/await)
 async function spawnNodeChildProcess(
   command: string[],

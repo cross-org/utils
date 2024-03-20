@@ -36,11 +36,10 @@ const enum AnsiCodes {
   BgWhite = "\x1b[47m",
 }
 
-  /**
-   * Contains methods for applying various ANSI text styles to console output.
-   */
+/**
+ * Contains methods for applying various ANSI text styles to console output.
+ */
 export class Colors {
-
   /**
    * Applies bold formatting to text.
    * @param {string} text The text to format.
@@ -260,13 +259,11 @@ export class Colors {
     return AnsiCodes.FgWhite + text + AnsiCodes.Reset;
   }
 }
-  /**
-   * Contains methods for controlling cursor behavior in the console, like movement, visibility,
-   * or clearing the screen.
-   */
+/**
+ * Contains methods for controlling cursor behavior in the console, like movement, visibility,
+ * or clearing the screen.
+ */
 export class Cursor {
-
-
   /**
    * Moves the cursor up a specified number of lines.
    * @param {number} lines The number of lines to move up (default: 1).

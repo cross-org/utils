@@ -45,11 +45,11 @@ export function args(all: boolean = false): string[] {
 
 /**
  * Provides command-line argument parsing functionality.
- * 
+ *
  * **Key Features:**
  * * Handles short and long flags (e.g., `-f` and `--flag`)
  * * Supports multiple values for a single flag
- * * Stores loose arguments (those not associated with flags) 
+ * * Stores loose arguments (those not associated with flags)
  * * Collects a "rest command" portion after the `--` delimiter, useful for subcommands.
  */
 export class ArgsParser {
@@ -115,17 +115,17 @@ export class ArgsParser {
 
   /**
    * Constructs a new instance of the ArgsParser class, parsing provided command-line arguments.
-   * 
-   * @param {string[]} cmdArgs - An array of command-line arguments to parse. 
+   *
+   * @param {string[]} cmdArgs - An array of command-line arguments to parse.
    *
    * @example
    * // Basic usage
-   * const argsParser = new ArgsParser(process.argv.slice(2)); 
-   * const inputFile = argsParser.get('input'); 
+   * const argsParser = new ArgsParser(process.argv.slice(2));
+   * const inputFile = argsParser.get('input');
    *
    * // Handling flags, multiple values, and loose arguments
-   * const options = argsParser.getArray('option'); 
-   * const isVerbose = argsParser.get('verbose');  
+   * const options = argsParser.getArray('option');
+   * const isVerbose = argsParser.get('verbose');
    * const looseArgs = argsParser.getLoose();
    */
   constructor(cmdArgs: string[]) {

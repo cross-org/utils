@@ -13,5 +13,8 @@
     "@cross/runtime": "jsr:@cross/runtime@^0.0.17",
     "@cross/test": "jsr:@cross/test@^0.0.8",
     "@std/assert": "jsr:@std/assert@^0.219.1"
+  },
+  "publish": {
+    "exclude": [".github", "*.test.ts"]
   }
 }

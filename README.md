@@ -39,6 +39,10 @@ bunx jsr add @cross/utils
 - **cwd()**
   - Returns the current working directory.
 
+- **table(data: string[][])**
+  - Generates a neatly formatted table representation of a 2D array and prints
+    it to the console.
+
 **Classes**
 
 - **Colors**
@@ -113,3 +117,19 @@ functionality:
 
 - **@cross/utils/cwd**
   - **cwd(): string** - Returns current working directory.
+
+* **@cross/utils/format**
+  - **table(data: string[][]): void** - Generates a neatly formatted table
+    representation of a 2D array and prints it to the console.
+    - **Parameter:**
+      - data: A 2D array of strings representing the table data.
+    - **Example:**
+      ```javascript
+      // Uses @cross/utils/colors to create bold headers
+      const myData = [
+        [Colors.bold("Name"), Colors.bold("Age"), Colors.bold("City")],
+        ["Alice", "25", "New York"],
+        ["Bob", "32", "London"],
+      ];
+      table(myData);
+      ```

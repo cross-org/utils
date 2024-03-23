@@ -1,6 +1,6 @@
 **@cross/utils**
 
-A collection of cross-runtime JavaScript utilities for Node.js, Deno, and Bun.
+A collection of cross-runtime JavaScript utilities for Node.js, Deno, and Bun. Part of the @cross suite - check out our growing collection of cross-runtime tools at [github.com/cross-org](https://github.com/cross-org).
 
 **Installation**
 

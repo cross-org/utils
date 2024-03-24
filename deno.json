@@ -1,6 +1,6 @@
 {
   "name": "@cross/utils",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "exports": {
     ".": "./mod.ts",
     "./ansi": "./utils/ansi.ts",
@@ -12,10 +12,14 @@
   },
   "imports": {
     "@cross/runtime": "jsr:@cross/runtime@^1.0.0",
-    "@cross/test": "jsr:@cross/test@^0.0.8",
+    "@cross/test": "jsr:@cross/test@^0.0.9",
     "@std/assert": "jsr:@std/assert@^0.220.1"
   },
   "publish": {
     "exclude": [".github", "*.test.ts"]
+  },
+  "tasks": {
+    "check": "deno fmt --check && deno lint && deno check mod.ts && deno doc --lint mod.ts && deno run -A mod.ts --slim --ignore-unused",
+    "check-deps": "deno run -rA jsr:@check/deps"
   }
 }

@@ -43,6 +43,10 @@ export function args(all: boolean = false): string[] {
   }
 }
 
+interface ArgsParserOptions {
+  aliases?: Record<string, string>;
+}
+
 /**
  * Provides command-line argument parsing functionality.
  *
@@ -56,6 +60,7 @@ export class ArgsParser {
   private readonly parsedArgs: Record<string, (string | boolean)[]>;
   private readonly looseArgs: string[];
   private readonly restCommand: string = "";
+  private readonly aliases: Record<string, string> = {};
 
   /**
    * Parses command-line arguments.
@@ -68,6 +73,7 @@ export class ArgsParser {
    */
   public static parseArgs(
     cmdArgs: string[],
+    options: ArgsParserOptions = {},
   ): {
     args: Record<string, (string | boolean)[]>;
     loose: string[];
@@ -86,7 +92,11 @@ export class ArgsParser {
         collectingRest = true;
       } else if (arg.startsWith("--") || arg.startsWith("-")) {
         const parts = arg.slice(arg.startsWith("--") ? 2 : 1).split("=");
-        const key = parts[0];
+        let key = parts[0];
+
+        // Handle aliases
+        key = options.aliases?.[key] ? options.aliases?.[key] : key;
+
         let value: string | boolean = true; // Default to boolean for flags
 
         if (parts.length > 1) {
@@ -128,32 +138,71 @@ export class ArgsParser {
    * const isVerbose = argsParser.get('verbose');
    * const looseArgs = argsParser.getLoose();
    */
-  constructor(cmdArgs: string[]) {
-    const result = ArgsParser.parseArgs(cmdArgs);
+  constructor(cmdArgs: string[], options: ArgsParserOptions = {}) {
+    if (options?.aliases) {
+      this.aliases = options.aliases;
+    }
+    const result = ArgsParser.parseArgs(cmdArgs, options);
     this.parsedArgs = result.args;
     this.looseArgs = result.loose;
     this.restCommand = result.rest;
   }
 
   /**
-   * Retrieves an array of values associated with a given argument name.
+   * Retrieves an array of values associated with a given argument name. A boolean arguments will be returned as an empty string.
    *
    * @param {string} argName The argument name.
-   * @returns {(string | boolean)[]} An array of values. Returns an empty array if the argument is not found.
+   * @returns {(string)[]} An array of values. Returns an empty array if the argument is not found.
    */
-  getArray(argName: string): (string | boolean)[] {
-    return this.parsedArgs[argName] || [];
+  getArray(argName: string): string[] {
+    const canonicalArgName = this.aliases[argName] || argName;
+    const values = this.parsedArgs[canonicalArgName] || []; // Handle undefined case
+    return values.map((value) => {
+      if (typeof value === "boolean") {
+        return ""; // Convert boolean to empty string
+      } else {
+        return value ? value.toString() : ""; // Handle all other values, including potential undefined
+      }
+    });
   }
 
   /**
-   * Retrieves the first value associated with a given argument name.
+   * Retrieves the first value associated with a given argument name, any string value will be converted to true, except "false" and "no" and "n".
    *
    * @param {string} argName The argument name.
-   * @returns {string|boolean|undefined} The first value, or undefined if the argument is not found.
+   * @returns {boolean}
    */
-  get(argName: string): string | boolean | undefined {
-    const value = this.parsedArgs[argName];
-    return Array.isArray(value) ? value[0] : value;
+  getBoolean(argName: string): boolean {
+    const canonicalArgName = this.aliases[argName] || argName;
+    const value = this.parsedArgs[canonicalArgName];
+    const firstValue = Array.isArray(value) ? value[0] : value;
+    const isString = value === undefined ? false : true;
+    if (isString) {
+      const firstValueClean = firstValue.toString().toLowerCase();
+      if (
+        firstValueClean === "no" || firstValueClean === "n" ||
+        firstValueClean == "false" || firstValueClean == "0"
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    return !!firstValue;
+  }
+
+  /**
+   * Retrieves the first string value associated with a given argument name, boolean values will be converted to string.
+   *
+   * @param {string} argName The argument name.
+   * @returns {string|undefined} The first value, or undefined if the argument is not found.
+   */
+  get(argName: string): string | undefined {
+    const canonicalArgName = this.aliases[argName] || argName;
+    console.log(canonicalArgName, this.parsedArgs);
+    const value = this.parsedArgs[canonicalArgName];
+    const firstValue = Array.isArray(value) ? value[0] : value;
+    return firstValue ? firstValue.toString() : undefined;
   }
 
   /**
@@ -163,7 +212,8 @@ export class ArgsParser {
    * @returns {number} The number of occurrences (0 if not found).
    */
   count(argName: string): number {
-    const value = this.parsedArgs[argName];
+    const canonicalArgName = this.aliases[argName] || argName;
+    const value = this.parsedArgs[canonicalArgName];
     return Array.isArray(value) ? value.length : (value ? 1 : 0);
   }
 

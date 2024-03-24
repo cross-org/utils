@@ -110,7 +110,7 @@ test("Test ArgsParser methods", () => {
   ];
   const parser = new ArgsParser(cmdArgs);
 
-  assertEquals(parser.getArray("v"), [true, true]);
+  assertEquals(parser.getArray("v"), ["", ""]);
   assertEquals(parser.get("port"), "8080");
   assertEquals(parser.count("config-file"), 1);
   assertEquals(parser.count("nonexistent"), 0);
@@ -168,4 +168,83 @@ test("Handle the '--' delimiter at the end", () => {
   const parser = new ArgsParser(cmdArgs);
   assertEquals(parser.getRest(), "");
   assertEquals(parser.hasRest(), false);
+});
+
+test("Test Boolean Conversion with true values", () => {
+  const parser = new ArgsParser(["--enabled", "Yes", "-t", "1"]);
+  assertEquals(parser.getBoolean("enabled"), true);
+  assertEquals(parser.getBoolean("t"), true);
+});
+
+test("Test Boolean Conversion with false values", () => {
+  const parser = new ArgsParser(["--foo", "NO", "-d", "0"]);
+  assertEquals(parser.getBoolean("foo"), false);
+  assertEquals(parser.getBoolean("d"), false);
+});
+
+test("Test Boolean Conversion with case sensitivity", () => {
+  const parser = new ArgsParser(["--Debug", "tRuE", "-e", "No"]);
+  assertEquals(parser.getBoolean("Debug"), true);
+  assertEquals(parser.getBoolean("e"), false);
+});
+
+test("Test String with case sensitivity", () => {
+  const parser = new ArgsParser(["--Debug", "tRuE", "-E", "No"]);
+  assertEquals(parser.get("debug"), undefined);
+  assertEquals(parser.get("e"), undefined);
+});
+
+test("Handle argument aliases", () => {
+  const cmdArgs = ["--db-host", "localhost", "-p", "3306"];
+  const options = { aliases: { "db-host": "host", "p": "port" } }; // Define aliases
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs, options);
+
+  assertEquals(parsedArgs, {
+    args: {
+      host: ["localhost"],
+      port: ["3306"],
+    },
+    loose: [],
+    rest: "",
+  });
+
+  const parser = new ArgsParser(cmdArgs, options);
+  assertEquals(parser.get("host"), "localhost");
+  assertEquals(parser.get("port"), "3306");
+});
+
+test("Aliasing long and short arguments", () => {
+  const cmdArgs = ["--file", "config.txt", "-d"];
+  const options = { aliases: { "f": "file", "debug": "d" } };
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs, options);
+
+  assertEquals(parsedArgs, {
+    args: {
+      file: ["config.txt"],
+      d: [true],
+    },
+    loose: [],
+    rest: "",
+  });
+
+  const parser = new ArgsParser(cmdArgs, options);
+  assertEquals(parser.get("f"), "config.txt");
+  assertEquals(parser.getBoolean("d"), true);
+});
+
+test("Aliases don't override original arguments", () => {
+  const cmdArgs = ["--file", "config.txt", "-f", "other.txt"];
+  const options = { aliases: { "f": "file" } };
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs, options);
+
+  assertEquals(parsedArgs, {
+    args: {
+      file: ["config.txt", "other.txt"],
+    },
+    loose: [],
+    rest: "",
+  });
+
+  const parser = new ArgsParser(cmdArgs, options);
+  assertEquals(parser.getArray("file").length, 2);
 });

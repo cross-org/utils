@@ -199,7 +199,6 @@ export class ArgsParser {
    */
   get(argName: string): string | undefined {
     const canonicalArgName = this.aliases[argName] || argName;
-    console.log(canonicalArgName, this.parsedArgs);
     const value = this.parsedArgs[canonicalArgName];
     const firstValue = Array.isArray(value) ? value[0] : value;
     return firstValue ? firstValue.toString() : undefined;

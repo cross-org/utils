@@ -29,7 +29,8 @@ async function spawnNodeChildProcess(
   const { spawn } = await import("node:child_process");
   //@ts-ignore Node specific
   const options: SpawnOptionsWithoutStdio = {
-    env,
+    //@ts-ignore Cross Runtime
+    env: { ...process.env, ...env },
     cwd: cwd,
     shell: false,
   };

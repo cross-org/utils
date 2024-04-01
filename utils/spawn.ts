@@ -1,4 +1,5 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
+import process, { env } from "node:process";
 
 /**
  * Represents the results of a spawned child process.
@@ -84,7 +85,7 @@ async function spawnBunChildProcess(
   const results = await Bun.spawn({
     cmd: command,
     // @ts-ignore process is runtime specific
-    env: { ...extraEnvVars }, // Merge environment variables
+    env: { ...process.env, ...extraEnvVars }, // Merge environment variables
     stdout: "pipe",
     stderr: "pipe",
     cwd,

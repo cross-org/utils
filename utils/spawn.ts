@@ -1,11 +1,31 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
 
+/**
+ * Represents the results of a spawned child process.
+ */
+export interface SpawnResult {
+  /**
+   * The exit code of the executed command. A value of 0 typically indicates success.
+   */
+  code: number;
+
+  /**
+   * The standard output of the command.
+   */
+  stdout: string;
+
+  /**
+   * The standard error of the command.
+   */
+  stderr: string;
+}
+
 // Runtime-specific execution functions (also using async/await)
 async function spawnNodeChildProcess(
   command: string[],
   env: Record<string, string> = {},
   cwd?: string,
-): Promise<{ code: number; stdout: string; stderr: string }> {
+): Promise<SpawnResult> {
   const { spawn } = await import("node:child_process");
   //@ts-ignore Node specific
   const options: SpawnOptionsWithoutStdio = {
@@ -38,7 +58,7 @@ async function spawnDenoChildProcess(
   command: string[],
   env: Record<string, string> = {},
   cwd?: string,
-): Promise<{ code: number; stdout: string; stderr: string }> {
+): Promise<SpawnResult> {
   // @ts-ignore Deno is specific to Deno
   const options: Deno.CommandOptions = {
     args: command.length > 1 ? command.slice(1) : [],
@@ -58,7 +78,7 @@ async function spawnBunChildProcess(
   command: string[],
   extraEnvVars: Record<string, string> = {},
   cwd?: string,
-): Promise<{ code: number; stdout: string; stderr: string }> {
+): Promise<SpawnResult> {
   // @ts-ignore Bun is runtime specific
   const results = await Bun.spawn({
     cmd: command,
@@ -90,7 +110,7 @@ async function spawnBunChildProcess(
  * @param {string[]} command - An array of strings representing the command and its arguments.
  * @param {Record<string, string>} [extraEnvVars] - An optional object containing additional environment variables to set for the command.
  * @param {string} [cwd] - An optional path specifying the current working directory for the command.
- * @returns {Promise<{ code: number; stdout: string; stderr: string }>} A Promise resolving with an object containing:
+ * @returns {Promise<SpawnResult>} A Promise resolving with an object containing:
  *   * code: The exit code of the executed command.
  *   * stdout: The standard output of the command.
  *   * stderr: The standard error of the command.
@@ -113,7 +133,7 @@ export async function spawn(
   command: string[],
   extraEnvVars: Record<string, string> = {},
   cwd?: string,
-): Promise<{ code: number; stdout: string; stderr: string }> {
+): Promise<SpawnResult> {
   switch (CurrentRuntime) {
     case Runtime.Node:
       return await spawnNodeChildProcess(command, extraEnvVars, cwd);

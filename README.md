@@ -45,6 +45,14 @@ bunx jsr add @cross/utils
   - Generates a neatly formatted table representation of a 2D array and prints
     it to the console.
 
+- **execPath()**
+  - Get the pathto the current runtime executable.
+
+- **resolvedExecPath()**
+  - Get the path to the current runtime executable, as indicated by the PATH
+    variable. Could be a version independent link such as `...nvm/current...`
+    instead of `...nvm/<version>...`.
+
 **Classes**
 
 - **Colors**
@@ -135,3 +143,29 @@ functionality:
       ];
       table(myData);
       ```
+
+- **execPath(): Promise<string>**
+  - Returns the actual path to the current runtime executable.
+  - **Examples:**
+  ```javascript
+  const runtimeExecPath = await execPath();
+
+  // Log the runtime for debugging:
+  console.log(`Process started using ${runtimeExecPath}`);
+
+  // Spawn a child process with the same runtime:
+  const childProcess = spawn(runtimeExecPath, ["other-script.js"]);
+  ```
+
+- **resolvedExecPath(): Promise<string>**
+  - Returns the resolved path (through PATH) to the current runtime executable.
+  - **Examples:**
+  ```javascript
+  const runtimeExecPath = await resolvedExecPath();
+
+  // Log the runtime for debugging:
+  console.log(`Process started using ${runtimeExecPath}`);
+
+  // Spawn a child process with the same runtime:
+  const childProcess = spawn(runtimeExecPath, ["other-script.js"]);
+  ```

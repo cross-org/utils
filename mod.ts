@@ -4,3 +4,4 @@ export { Colors, Cursor, stripAnsi } from "./utils/ansi.ts";
 export { spawn } from "./utils/spawn.ts";
 export type { SpawnResult } from "./utils/spawn.ts";
 export { cwd } from "./utils/cwd.ts";
+export { execPath, resolvedExecPath } from "./utils/execpath.ts";

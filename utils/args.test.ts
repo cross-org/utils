@@ -5,7 +5,7 @@ import { ArgsParser } from "./args.ts";
 
 test("Parse arguments using space as separator", () => {
   const cmdArgs = ["--port", "8080", "-v", "--configFile", "app.config"];
-  const parsedArgs = ArgsParser.parseArgs(cmdArgs);
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs, { boolean: ["v"] });
 
   assertEquals(parsedArgs, {
     args: {
@@ -33,7 +33,7 @@ test("Parse arguments using equal sign as separator", () => {
 
 test("Handle flags with no values", () => {
   const cmdArgs = ["-v", "--debug"];
-  const parsedArgs = ArgsParser.parseArgs(cmdArgs);
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs, { boolean: ["v", "debug"] });
 
   assertEquals(parsedArgs, {
     args: {
@@ -86,7 +86,7 @@ test("Handle arguments with embedded equals signs", () => {
 
 test("Handle multiple occurrences of a flag", () => {
   const cmdArgs = ["-v", "-v", "--config", "prod.config"];
-  const parsedArgs = ArgsParser.parseArgs(cmdArgs);
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs, { boolean: ["v"] });
 
   assertEquals(parsedArgs, {
     args: {
@@ -138,7 +138,7 @@ test("Handle everything after '--' as the rest command", () => {
 
 test("Handle multiple '--' delimiters", () => {
   const cmdArgs = ["--flag", "--", "start", "--", "build"];
-  const parsedArgs = ArgsParser.parseArgs(cmdArgs);
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs, { boolean: ["flag"] });
 
   assertEquals(parsedArgs, {
     args: {
@@ -155,7 +155,7 @@ test("Handle multiple '--' delimiters", () => {
 
 test("Handle the '--' delimiter at the end", () => {
   const cmdArgs = ["--flag", "--"];
-  const parsedArgs = ArgsParser.parseArgs(cmdArgs);
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs, { boolean: ["flag"] });
 
   assertEquals(parsedArgs, {
     args: {
@@ -171,9 +171,12 @@ test("Handle the '--' delimiter at the end", () => {
 });
 
 test("Test Boolean Conversion with true values", () => {
-  const parser = new ArgsParser(["--enabled", "Yes", "-t", "1"]);
+  const parser = new ArgsParser(["--enabled", "Yes", "-t", "1"], {
+    boolean: ["enabled"],
+  });
   assertEquals(parser.getBoolean("enabled"), true);
   assertEquals(parser.getBoolean("t"), true);
+  assertEquals(parser.getLoose()[0], "Yes");
 });
 
 test("Test Boolean Conversion with false values", () => {
@@ -216,6 +219,25 @@ test("Handle argument aliases", () => {
 test("Aliasing long and short arguments", () => {
   const cmdArgs = ["--file", "config.txt", "-d"];
   const options = { aliases: { "f": "file", "debug": "d" } };
+  const parsedArgs = ArgsParser.parseArgs(cmdArgs, { boolean: ["d"] });
+
+  assertEquals(parsedArgs, {
+    args: {
+      file: ["config.txt"],
+      d: [true],
+    },
+    loose: [],
+    rest: "",
+  });
+
+  const parser = new ArgsParser(cmdArgs, options);
+  assertEquals(parser.get("f"), "config.txt");
+  assertEquals(parser.getBoolean("d"), true);
+});
+
+test("Aliasing long and short arguments with alias in boolean", () => {
+  const cmdArgs = ["--file", "config.txt", "-d"];
+  const options = { aliases: { "f": "file", "debug": "d" }, boolean: ["d"] };
   const parsedArgs = ArgsParser.parseArgs(cmdArgs, options);
 
   assertEquals(parsedArgs, {

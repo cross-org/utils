@@ -82,7 +82,9 @@ import {
 } from "@cross/utils";
 
 // Argument processing
-const parser = new ArgsParser(args(true));
+const parser = new ArgsParser(args(true), {
+  aliases: { "verbose": "v", boolean: ["verbose"] },
+});
 const port = parser.get("port") || "8080";
 
 // Colorful output

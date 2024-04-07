@@ -1,5 +1,5 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
-import process, { env } from "node:process";
+import process from "node:process";
 
 /**
  * Represents the results of a spawned child process.

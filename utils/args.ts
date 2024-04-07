@@ -44,7 +44,27 @@ export function args(all: boolean = false): string[] {
 }
 
 interface ArgsParserOptions {
+  /**
+   * An optional object mapping argument names to their aliases. This allows
+   * users to provide alternative command-line flags that trigger the same behavior.
+   *
+   * Example:
+   * ```
+   * { aliases: { 'verbose': 'v', 'output': 'o' } }
+   * ```
+   */
   aliases?: Record<string, string>;
+
+  /**
+   * An optional array of argument names that should be treated as boolean flags.
+   * The presence of these flags indicates `true`, their absence indicates `false`.
+   *
+   * Example:
+   * ```
+   * { boolean: ['enabled', 'debug', 'force'] }
+   * ```
+   */
+  boolean?: string[]; // An array of argument names
 }
 
 /**
@@ -83,6 +103,15 @@ export class ArgsParser {
     const looseArgs: string[] = [];
     let restCommand = "";
     let collectingRest = false;
+
+    // Normalize options.boolean (if provided)
+    if (options.boolean && options.aliases) {
+      const normalizedBoolean = options.boolean.map((argName) => {
+        return options.aliases![argName] || argName;
+      });
+      options.boolean = normalizedBoolean;
+    }
+
     for (let i = 0; i < cmdArgs.length; i++) {
       const arg = cmdArgs[i];
 
@@ -97,13 +126,21 @@ export class ArgsParser {
         // Handle aliases
         key = options.aliases?.[key] ? options.aliases?.[key] : key;
 
-        let value: string | boolean = true; // Default to boolean for flags
+        let isBoolean = false;
+        if (options.boolean?.includes(key)) {
+          isBoolean = true;
+        }
 
-        if (parts.length > 1) {
+        let value: string | boolean = isBoolean ? true : "";
+
+        // Check if argument should be treated as boolean
+        if (isBoolean) {
+          // Skip to next argument
+        } else if (parts.length > 1) {
           value = parts[1];
         } else if (i + 1 < cmdArgs.length && !cmdArgs[i + 1].startsWith("-")) {
           value = cmdArgs[i + 1];
-          i++;
+          i++; // Skip the next argument
         }
 
         // Handle multiple values for a flag

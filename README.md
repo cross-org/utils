@@ -38,9 +38,6 @@ bunx jsr add @cross/utils
 - **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string)**
   - Spawns a sub process.
 
-- **cwd()**
-  - Returns the current working directory.
-
 - **table(data: string[][])**
   - Generates a neatly formatted table representation of a 2D array and prints
     it to the console.
@@ -126,9 +123,6 @@ functionality:
 - **@cross/utils/exit**
   - **exit(code?: number): void** - Terminates the process with control over the
     exit code.
-
-- **@cross/utils/cwd**
-  - **cwd(): string** - Returns current working directory.
 
 * **@cross/utils/format**
   - **table(data: string[][]): void** - Generates a neatly formatted table

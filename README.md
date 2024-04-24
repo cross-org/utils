@@ -43,7 +43,10 @@ bunx jsr add @cross/utils
     it to the console.
 
 - **execPath()**
-  - Get the pathto the current runtime executable.
+  - Get the path to the current runtime executable.
+
+- **pid()**
+  - Get the pid of the currently running process.
 
 - **resolvedExecPath()**
   - Get the path to the current runtime executable, as indicated by the PATH

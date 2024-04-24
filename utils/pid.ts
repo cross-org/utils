@@ -12,7 +12,7 @@ import { CurrentRuntime, Runtime } from "@cross/runtime";
 export function pid(): number {
   if (CurrentRuntime === Runtime.Deno) {
     //@ts-ignore cross-runtime
-    return crossPid();
+    return Deno.pid;
   } else {
     //@ts-ignore cross-runtime
     return process.pid;

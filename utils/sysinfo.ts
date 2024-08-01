@@ -1,12 +1,34 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
 import { freemem, loadavg, totalmem, uptime as nodeUptime } from "node:os";
 
+/**
+ * Provides information about the memory usage of the current process.
+ */
 export interface ProcessMemoryInfo {
+  /**
+   * (Optional) The amount of memory, in bytes, that is not part of the heap and is used by the process for other purposes.
+   * This might include memory used for stack, code, or external resources.
+   * Not available in all runtimes (e.g., not directly provided in Node.js).
+   */
   external?: number;
+
+  /**
+   * The total size of the heap, in bytes, that is available to the process. This includes both used and unused heap space.
+   */
   heapTotal: number;
+
+  /**
+   * The amount of heap memory, in bytes, that is currently being used by the process.
+   */
   heapUsed: number;
+
+  /**
+   * (Node.js, Bun) Resident Set Size (RSS): The total amount of memory, in bytes, occupied by the process in RAM. This includes both the heap and other memory used by the process.
+   * (Deno) The amount of memory, in bytes, used by the process's resident set (portion of memory held in RAM).
+   */
   rss: number;
 }
+
 /** Based on Deno.SystemMemoryInfo */
 export interface SystemMemoryInfo {
   /** Total installed memory in bytes. */
@@ -29,6 +51,9 @@ export interface SystemMemoryInfo {
   swapFree: number;
 }
 
+/**
+ * Provides information about the overall system memory usage.
+ */
 export function memoryUsage(): ProcessMemoryInfo {
   let memoryUsageResult: ProcessMemoryInfo;
   if (CurrentRuntime === Runtime.Deno) {
@@ -47,6 +72,14 @@ export function memoryUsage(): ProcessMemoryInfo {
   return memoryUsageResult;
 }
 
+/**
+ * Retrieves the system load averages.
+ *
+ * Load averages represent the average system load over a period of time (typically 1, 5, and 15 minutes).
+ * They give an indication of how busy the system is and whether it's overloaded.
+ *
+ * @returns {number[]} An array containing three load average values (1, 5, and 15 minutes), or an empty array if the runtime is unsupported.
+ */
 export function loadAvg(): number[] {
   let loadAvgResult: number[];
   if (CurrentRuntime === Runtime.Deno) {
@@ -63,6 +96,13 @@ export function loadAvg(): number[] {
   return loadAvgResult;
 }
 
+/**
+ * Retrieves the system uptime.
+ *
+ * Uptime is the amount of time, in seconds, that the system has been running since it was last booted.
+ *
+ * @returns {number} The system uptime in seconds, or -1 if the runtime is unsupported.
+ */
 export function uptime(): number {
   let uptimeResult: number;
   if (CurrentRuntime === Runtime.Deno) {
@@ -78,6 +118,19 @@ export function uptime(): number {
   return uptimeResult;
 }
 
+/**
+ * Retrieves information about the system memory usage.
+ *
+ * Provides details about the total, free, and (in some cases) additional memory statistics.
+ *
+ * Note: The information returned depends on the current JavaScript runtime:
+ *
+ *   - **Deno:**  Returns a complete `SystemMemoryInfo` object with all fields populated.
+ *   - **Node.js/Bun:** Returns a `SystemMemoryInfo` object with `total` and `free` fields accurately filled. Other fields are estimated or unavailable (-1).
+ *   - **Unsupported Runtimes:**  Returns a `SystemMemoryInfo` object with all fields set to -1.
+ *
+ * @returns {SystemMemoryInfo} An object containing details about system memory usage.
+ */
 export function systemMemoryInfo(): SystemMemoryInfo {
   let memoryInfoResult: SystemMemoryInfo;
   if (CurrentRuntime === Runtime.Deno) {

@@ -13,3 +13,4 @@ export {
   systemMemoryInfo,
   uptime,
 } from "./utils/sysinfo.ts";
+export { deepFreeze, deepSeal } from "./utils/objectManip.ts";

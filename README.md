@@ -53,6 +53,18 @@ bunx jsr add @cross/utils
     variable. Could be a version independent link such as `...nvm/current...`
     instead of `...nvm/<version>...`.
 
+- **deepFreeze<T>(obj: T, createCopy?: boolean): T**
+  - Recursively freezes an object and all its nested objects. Freezing prevents
+    any modifications to the object's properties.
+  - If `createCopy` is `true` (default is `false`), a new frozen deep copy of
+    the object is returned, leaving the original unchanged.
+- **deepSeal<T>(obj: T, createCopy?: boolean): T**
+  - Recursively seals an object and all its nested objects. Sealing prevents new
+    properties from being added or removed, but existing properties can still be
+    modified.
+  - If `createCopy` is `true` (default is `false`), a new sealed deep copy of
+    the object is returned, leaving the original unchanged.
+
 **Classes**
 
 - **Colors**
@@ -167,4 +179,35 @@ functionality:
 
   // Spawn a child process with the same runtime:
   const childProcess = spawn(runtimeExecPath, ["other-script.js"]);
+  ```
+
+- **@cross/utils/objectManip**
+  - **deepFreeze(obj: T, createCopy?: boolean): T** - Recursively freezes an
+    object and all its nested objects.
+  - **deepSeal(obj: T, createCopy?: boolean): T** - Recursively seals an object
+    and all its nested objects.
+  - **Examples:**
+  ```javascript
+  // deepFreeze
+  const obj = { a: 1, b: { c: 2 } };
+  deepFreeze(obj); // obj is now frozen
+  obj.a = 10; // Throws an error in strict mode
+
+  const original = { x: 5, y: { z: 6 } };
+  const frozenCopy = deepFreeze(original, true); // frozenCopy is a new frozen object
+  frozenCopy.x = 20; // Throws an error in strict mode
+  original.x = 20; // Succeeds, original is unchanged
+
+  // deepSeal
+  const obj = { a: 1, b: { c: 2 } };
+  deepSeal(obj); // obj is now sealed
+  obj.a = 10; // Succeeds because 'a' is writable
+  obj.d = 4; // Throws an error in strict mode
+  delete obj.a; // Throws an error in strict mode
+
+  const original = { x: 5, y: { z: 6 } };
+  const sealedCopy = deepSeal(original, true); // sealedCopy is a new sealed object
+  sealedCopy.x = 20; // Succeeds because 'x' is writable
+  sealedCopy.w = 7; // Throws an error in strict mode
+  original.w = 20; // Succeeds, original is unchanged
   ```

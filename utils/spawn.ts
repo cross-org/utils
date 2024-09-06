@@ -1,4 +1,5 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
+import { writeFile } from "@cross/fs/io";
 import process from "node:process";
 
 /**
@@ -29,17 +30,17 @@ export interface StdIO {
   /**
    * The input into the spawned process.
    */
-  stdin: ReadableStream;
+  stdin: ReadableStream | null;
 
   /**
    * The output from the spawned process.
    */
-  stdout: WritableStream;
+  stdout: WritableStream | null;
 
   /**
    * The errors from the spawned process.
    */
-  stderr: WritableStream;
+  stderr: WritableStream | null;
 }
 
 // Runtime-specific execution functions (also using async/await)
@@ -50,30 +51,50 @@ async function spawnNodeChildProcess(
   stdio?: StdIO
 ): Promise<SpawnResult> {
   const { spawn } = await import("node:child_process");
-  //@ts-ignore Node specific
-  const options: SpawnOptionsWithoutStdio = {
-    //@ts-ignore Cross Runtime
-    env: { ...process.env, ...env },
-    cwd: cwd,
-    shell: false,
-  };
+
+  // Node has its own stream types
+  const { Readable, Writable, PassThrough } = await import("node:stream");
+
+  // Node doesn't seem to have any types for streams
+  // deno-lint-ignore no-explicit-any
+  let stdio_node: any[]
+
+  let stdoutBuffer = "";
+  let stderrBuffer = "";
+
+  if (stdio) {
+    stdio_node = [
+      // @ts-ignore Node is a bit funny with types here
+      stdio.stdin ? Readable.fromWeb(stdio.stdin) : "ignore",
+      stdio.stdout ? Writable.fromWeb(stdio.stdout) : "ignore",
+      stdio.stderr ? Writable.fromWeb(stdio.stderr) : "ignore",
+    ];
+  } else {
+    const stdout = new PassThrough();
+    const stderr = new PassThrough();
+
+    stdio_node = ["ignore", stdout, stderr];
+
+    stdout.on("data", (data: string) => stdoutBuffer += data.toString());
+    stderr.on("data", (data: string) => stderrBuffer += data.toString());
+  }
+
   const childProcess = spawn(
     command[0],
     command.length > 1 ? command.slice(1) : [],
-    options,
+    {
+      env: { ...process.env, ...env },
+      cwd: cwd,
+      shell: false,
+      stdio: stdio_node
+    },
   );
-
-  let stdout = "";
-  let stderr = "";
-
-  childProcess.stdout.on("data", (data: string) => stdout += data.toString());
-  childProcess.stderr.on("data", (data: string) => stderr += data.toString());
 
   return new Promise((resolve, reject) => { // Still need Promise here due to event listeners
     childProcess.on("error", (error: Error) => reject(error));
     childProcess.on(
       "close",
-      (code: number) => resolve({ code, stdout, stderr }),
+      (code: number) => resolve({ code, stdout: stdoutBuffer, stderr: stderrBuffer }),
     );
   });
 }
@@ -89,13 +110,26 @@ async function spawnDenoChildProcess(
     args: command.length > 1 ? command.slice(1) : [],
     env: { ...env },
     cwd,
+    stdin: stdio?.stdin === null ? "null" : undefined,
+    stdout: stdio?.stdout === null ? "null" : undefined,
+    stderr: stdio?.stderr === null ? "null" : undefined,
   };
+
   const cmd = new Deno.Command(command[0], options);
-  const output = await cmd.output();
+  const childProcess = cmd.spawn();
+
+  if (stdio) {
+    if (stdio.stdin) stdio.stdin.pipeTo(childProcess.stdin);
+    if (stdio.stdout) childProcess.stdout.pipeTo(stdio.stdout);
+    if (stdio.stderr) childProcess.stderr.pipeTo(stdio.stderr);
+  }
+
+  const output = await childProcess.output()
+
   return {
     code: output.code,
-    stdout: new TextDecoder().decode(output.stdout),
-    stderr: new TextDecoder().decode(output.stderr),
+    stdout: stdio ? "" : new TextDecoder().decode(output.stdout),
+    stderr: stdio ? "" : new TextDecoder().decode(output.stderr),
   };
 }
 

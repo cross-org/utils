@@ -1,5 +1,4 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
-import { writeFile } from "@cross/fs/io";
 import process from "node:process";
 
 /**
@@ -174,10 +173,11 @@ async function spawnBunChildProcess(
  * @param {string[]} command - An array of strings representing the command and its arguments.
  * @param {Record<string, string>} [extraEnvVars] - An optional object containing additional environment variables to set for the command.
  * @param {string} [cwd] - An optional path specifying the current working directory for the command.
+ * @param {StdIO} [stdio] - An optional object specifying streams to use instead of buffering the output.
  * @returns {Promise<SpawnResult>} A Promise resolving with an object containing:
  *   * code: The exit code of the executed command.
- *   * stdout: The standard output of the command.
- *   * stderr: The standard error of the command.
+ *   * stdout: The standard output of the command (empty if stdio argument supplied).
+ *   * stderr: The standard error of the command (empty if stdio argument supplied).
  *
  * @throws {Error} If the current runtime is not supported.
  *
@@ -197,14 +197,15 @@ export async function spawn(
   command: string[],
   extraEnvVars: Record<string, string> = {},
   cwd?: string,
+  stdio?: StdIO,
 ): Promise<SpawnResult> {
   switch (CurrentRuntime) {
     case Runtime.Node:
-      return await spawnNodeChildProcess(command, extraEnvVars, cwd);
+      return await spawnNodeChildProcess(command, extraEnvVars, cwd, stdio);
     case Runtime.Deno:
-      return await spawnDenoChildProcess(command, extraEnvVars, cwd);
+      return await spawnDenoChildProcess(command, extraEnvVars, cwd, stdio);
     case Runtime.Bun:
-      return await spawnBunChildProcess(command, extraEnvVars, cwd);
+      return await spawnBunChildProcess(command, extraEnvVars, cwd, stdio);
     default:
       throw new Error(`Unsupported runtime: ${CurrentRuntime}`);
   }

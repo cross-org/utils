@@ -21,11 +21,33 @@ export interface SpawnResult {
   stderr: string;
 }
 
+/**
+ * Use to pass stdin, stdout and stderr to spawn() instead of getting all the
+ * text at the end.
+ */
+export interface StdIO {
+  /**
+   * The input into the spawned process.
+   */
+  stdin: ReadableStream;
+
+  /**
+   * The output from the spawned process.
+   */
+  stdout: WritableStream;
+
+  /**
+   * The errors from the spawned process.
+   */
+  stderr: WritableStream;
+}
+
 // Runtime-specific execution functions (also using async/await)
 async function spawnNodeChildProcess(
   command: string[],
   env: Record<string, string> = {},
   cwd?: string,
+  stdio?: StdIO
 ): Promise<SpawnResult> {
   const { spawn } = await import("node:child_process");
   //@ts-ignore Node specific
@@ -60,6 +82,7 @@ async function spawnDenoChildProcess(
   command: string[],
   env: Record<string, string> = {},
   cwd?: string,
+  stdio?: StdIO
 ): Promise<SpawnResult> {
   // @ts-ignore Deno is specific to Deno
   const options: Deno.CommandOptions = {
@@ -80,6 +103,7 @@ async function spawnBunChildProcess(
   command: string[],
   extraEnvVars: Record<string, string> = {},
   cwd?: string,
+  stdio?: StdIO
 ): Promise<SpawnResult> {
   // @ts-ignore Bun is runtime specific
   const results = await Bun.spawn({

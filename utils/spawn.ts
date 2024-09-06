@@ -48,7 +48,7 @@ async function spawnNodeChildProcess(
   command: string[],
   env: Record<string, string> = {},
   cwd?: string,
-  stdio?: StdIO
+  stdio?: StdIO,
 ): Promise<SpawnResult> {
   const { spawn } = await import("node:child_process");
 
@@ -103,7 +103,7 @@ async function spawnDenoChildProcess(
   command: string[],
   env: Record<string, string> = {},
   cwd?: string,
-  stdio?: StdIO
+  stdio?: StdIO,
 ): Promise<SpawnResult> {
   // @ts-ignore Deno is specific to Deno
   const options: Deno.CommandOptions = {
@@ -137,30 +137,34 @@ async function spawnBunChildProcess(
   command: string[],
   extraEnvVars: Record<string, string> = {},
   cwd?: string,
-  stdio?: StdIO
+  stdio?: StdIO,
 ): Promise<SpawnResult> {
   // @ts-ignore Bun is runtime specific
-  const results = await Bun.spawn({
+  const childProcess = await Bun.spawn({
     cmd: command,
     // @ts-ignore process is runtime specific
     env: { ...process.env, ...extraEnvVars }, // Merge environment variables
-    stdout: "pipe",
-    stderr: "pipe",
     cwd,
+    stdin: stdio?.stdin === null ? null : "pipe",
+    stdout: stdio?.stdout === null ? null : "pipe",
+    stderr: stdio?.stderr === null ? null : "pipe",
   });
 
-  // Convert ReadableStreams to strings
-  await results.exited;
+  if (stdio) {
+    if (stdio.stdin) stdio.stdin.pipeTo(childProcess.stdin);
+    if (stdio.stdout) childProcess.stdout.pipeTo(stdio.stdout);
+    if (stdio.stderr) childProcess.stderr.pipeTo(stdio.stderr);
+  }
 
-  // @ts-ignore Bun is runtime specific
-  const stdout = await Bun.readableStreamToText(results.stdout);
-  // @ts-ignore Bun is runtime specific
-  const stderr = await Bun.readableStreamToText(results.stderr);
+  // Convert ReadableStreams to strings
+  await childProcess.exited;
 
   return {
-    code: results.exitCode,
-    stdout,
-    stderr,
+    code: childProcess.exitCode,
+    // @ts-ignore Bun is runtime specific
+    stdout: stdio ? "" : await Bun.readableStreamToText(childProcess.stdout),
+    // @ts-ignore Bun is runtime specific
+    stderr: stdio ? "" :await Bun.readableStreamToText(childProcess.stderr),
   };
 }
 

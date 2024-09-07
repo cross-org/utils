@@ -35,7 +35,7 @@ bunx jsr add @cross/utils
 - **stripAnsi(text: string): string**
   - Removes all ANSI control codes from a string for cleaner logs and output.
 
-- **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string)**
+- **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string, stdio: StdIO)**
   - Spawns a sub process.
 
 - **table(data: string[][])**
@@ -126,7 +126,7 @@ functionality:
   - **Colors Class** - Provides methods for easy console text styling.
 
 - **@cross/utils/spawn**
-  - **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string):
+  - **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string, stdio: StdIO):
     Promise<>** - Spawns subprocesses in a cross-runtime manner.
 
 - **@cross/utils/args**

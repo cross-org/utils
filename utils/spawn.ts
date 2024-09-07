@@ -123,14 +123,12 @@ export function spawn(
     },
   );
 
-  console.log(Readable.fromWeb, Writable.fromWeb)
-
   // @ts-ignore Node's types here are weird
-  if (stdio.stdin) Readable.fromWeb(stdio.stdin).pipe(childProcess.stdin);
+  if (stdio.stdin) Readable.fromWeb(stdio.stdin).pipe(childProcess.stdin, { end: false });
   // @ts-ignore Node's types here are weird
-  if (stdio.stdout) childProcess.stdout.pipe(Writable.fromWeb(stdio.stdout));
+  if (stdio.stdout) childProcess.stdout.pipe(Writable.fromWeb(stdio.stdout), { end: false });
   // @ts-ignore Node's types here are weird
-  if (stdio.stderr) childProcess.stderr.pipe(Writable.fromWeb(stdio.stderr));
+  if (stdio.stderr) childProcess.stderr.pipe(Writable.fromWeb(stdio.stderr), { end: false });
 
   return new Promise((resolve, reject) => { // Still need Promise here due to event listeners
     childProcess.on("error", (error: Error) => reject(error));

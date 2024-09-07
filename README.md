@@ -149,7 +149,7 @@ functionality:
   - **exit(code?: number): void** - Terminates the process with control over the
     exit code.
 
-* **@cross/utils/format**
+- **@cross/utils/format**
   - **table(data: string[][]): void** - Generates a neatly formatted table
     representation of a 2D array and prints it to the console.
     - **Parameter:**
@@ -221,3 +221,11 @@ functionality:
   sealedCopy.w = 7; // Throws an error in strict mode
   original.w = 20; // Succeeds, original is unchanged
   ```
+  
+- **@cross/utils/stdio**
+  - **stdin(): ReadableStream**
+    - Get the stdin as a web-standard `ReadableStream` object.
+  - **stdout(): WritableStream**
+    - Get the stdout as a web-standard `WritableStream` object.
+  - **stderr(): WritableStream**
+    - Get the stderr as a web-standard `WritableStream` object.

@@ -15,7 +15,7 @@ if (CurrentRuntime === Runtime.Bun) {
         writer.write(chunk);
       },
     });
-  }
+  };
 }
 
 /**
@@ -98,18 +98,22 @@ export function spawn(
     stdio = {
       stdin: null,
       stdout: new WritableStream({
-        write(chunk) {stdoutBuffer += chunk.toString()},
+        write(chunk) {
+          stdoutBuffer += chunk.toString();
+        },
       }),
       stderr: new WritableStream({
-        write(chunk) {stderrBuffer += chunk.toString()},
+        write(chunk) {
+          stderrBuffer += chunk.toString();
+        },
       }),
-    }
+    };
   }
 
   const stdio_node: ("pipe" | "inherit" | "ignore")[] = [
     stdio.stdin === "inherit" ? "inherit" : stdio.stdin ? "pipe" : "ignore",
     stdio.stdout === "inherit" ? "inherit" : stdio.stdout ? "pipe" : "ignore",
-    stdio.stderr === "inherit" ? "inherit" : stdio.stderr ? "pipe" : "ignore"
+    stdio.stderr === "inherit" ? "inherit" : stdio.stderr ? "pipe" : "ignore",
   ];
 
   const childProcess = spawnChild(
@@ -123,18 +127,27 @@ export function spawn(
     },
   );
 
-  // @ts-ignore Node's types here are weird
-  if (stdio.stdin instanceof ReadableStream) Readable.fromWeb(stdio.stdin).pipe(childProcess.stdin, { end: false });
-  // @ts-ignore Node's types here are weird
-  if (stdio.stdout instanceof WritableStream) childProcess.stdout.pipe(Writable.fromWeb(stdio.stdout), { end: false });
-  // @ts-ignore Node's types here are weird
-  if (stdio.stderr instanceof WritableStream) childProcess.stderr.pipe(Writable.fromWeb(stdio.stderr), { end: false });
+  if (stdio.stdin instanceof ReadableStream) {
+    // @ts-ignore Node's types here are weird
+    Readable.fromWeb(stdio.stdin).pipe(childProcess.stdin, { end: false });
+  }
+
+  if (stdio.stdout instanceof WritableStream) {
+    // @ts-ignore Node's types here are weird
+    childProcess.stdout.pipe(Writable.fromWeb(stdio.stdout), { end: false });
+  }
+
+  if (stdio.stderr instanceof WritableStream) {
+    // @ts-ignore Node's types here are weird
+    childProcess.stderr.pipe(Writable.fromWeb(stdio.stderr), { end: false });
+  }
 
   return new Promise((resolve, reject) => { // Still need Promise here due to event listeners
     childProcess.on("error", (error: Error) => reject(error));
     childProcess.on(
       "close",
-      (code: number) => resolve({ code, stdout: stdoutBuffer, stderr: stderrBuffer }),
+      (code: number) =>
+        resolve({ code, stdout: stdoutBuffer, stderr: stderrBuffer }),
     );
   });
 }

@@ -1,4 +1,5 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
+import process from "node:process";
 
 /**
  * Retrieves command-line arguments in a cross-runtime compatible manner.

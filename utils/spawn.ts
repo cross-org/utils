@@ -42,7 +42,7 @@ export interface SpawnResult {
  * Use to pass stdin, stdout and stderr to spawn() instead of getting all the
  * text at the end.
  */
-export interface StdIO {
+export interface SpawnStdIO {
   /**
    * The input into the spawned process.
    */
@@ -89,7 +89,7 @@ export function spawn(
   command: string[],
   env: Record<string, string> = {},
   cwd?: string,
-  stdio?: StdIO,
+  stdio?: SpawnStdIO,
 ): Promise<SpawnResult> {
   let stdoutBuffer = "";
   let stderrBuffer = "";

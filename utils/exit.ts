@@ -1,4 +1,5 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
+import process from "node:process";
 
 /**
  * Terminates the current process in a cross-runtime compatible manner.

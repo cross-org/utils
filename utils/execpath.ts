@@ -1,5 +1,6 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
 import { which } from "@cross/fs/stat";
+import process from "node:process";
 
 /**
  * Cross-runtime compatible way to return the current executable path in a  manner, regardless of Node, Deno or Bun.

@@ -1,5 +1,22 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
+
+import { spawn as spawnChild } from "node:child_process";
+import { Readable, Writable } from "node:stream";
+
 import process from "node:process";
+
+if (CurrentRuntime === Runtime.Bun) {
+  // Bun has a bug in Writable.fromWeb, so polyfill
+  Writable.fromWeb = (writableStream: WritableStream) => {
+    const writer = writableStream.getWriter();
+
+    return new Writable({
+      write(chunk) {
+        writer.write(chunk);
+      },
+    });
+  }
+}
 
 /**
  * Represents the results of a spawned child process.
@@ -42,161 +59,11 @@ export interface StdIO {
   stderr: WritableStream | null;
 }
 
-// Runtime-specific execution functions (also using async/await)
-async function spawnNodeChildProcess(
-  command: string[],
-  env: Record<string, string> = {},
-  cwd?: string,
-  stdio?: StdIO,
-): Promise<SpawnResult> {
-  const { spawn } = await import("node:child_process");
-
-  // Node has its own stream types
-  const { Readable, Writable } = await import("node:stream");
-
-  let stdoutBuffer = "";
-  let stderrBuffer = "";
-
-  if (!stdio) {
-    stdio = {
-      stdin: null,
-      stdout: new WritableStream({
-        write(chunk) {stdoutBuffer += chunk.toString()}
-      }),
-      stderr: new WritableStream({
-        write(chunk) {stderrBuffer += chunk.toString()}
-      }),
-    }
-  }
-
-  const stdio_node: ("pipe" | "ignore")[] = [
-    stdio.stdin ? "pipe" : "ignore",
-    stdio.stdout ? "pipe" : "ignore",
-    stdio.stderr ? "pipe" : "ignore"
-  ];
-
-  const childProcess = spawn(
-    command[0],
-    command.length > 1 ? command.slice(1) : [],
-    {
-      env: { ...process.env, ...env },
-      cwd: cwd,
-      shell: false,
-      stdio: stdio_node,
-    },
-  );
-
-  // @ts-ignore Node's types here are weird
-  if (stdio.stdin) Readable.fromWeb(stdio.stdin).pipe(childProcess.stdin);
-  // @ts-ignore Node's types here are weird
-  if (stdio.stdout) childProcess.stdout.pipe(Writable.fromWeb(stdio.stdout));
-  // @ts-ignore Node's types here are weird
-  if (stdio.stderr) childProcess.stderr.pipe(Writable.fromWeb(stdio.stderr));
-
-  return new Promise((resolve, reject) => { // Still need Promise here due to event listeners
-    childProcess.on("error", (error: Error) => reject(error));
-    childProcess.on(
-      "close",
-      (code: number) => resolve({ code, stdout: stdoutBuffer, stderr: stderrBuffer }),
-    );
-  });
-}
-
-async function spawnDenoChildProcess(
-  command: string[],
-  env: Record<string, string> = {},
-  cwd?: string,
-  stdio?: StdIO,
-): Promise<SpawnResult> {
-  // @ts-ignore Deno is specific to Deno
-  const options: Deno.CommandOptions = {
-    args: command.length > 1 ? command.slice(1) : [],
-    env: { ...env },
-    cwd,
-    stdin: stdio?.stdin === null ? "null" : "piped",
-    stdout: stdio?.stdout === null ? "null" : "piped",
-    stderr: stdio?.stderr === null ? "null" : "piped",
-  };
-
-  const cmd = new Deno.Command(command[0], options);
-  const childProcess = cmd.spawn();
-
-  if (stdio) {
-    const abort = new AbortController();
-
-    const options = {
-      signal: abort.signal,
-      preventAbort: true,
-      preventCancel: true,
-      preventClose: true,
-    };
-
-    const pipes: Promise<void>[] = []
-
-    if (stdio.stdin) pipes.push(stdio.stdin.pipeTo(childProcess.stdin, options));
-    if (stdio.stdout) pipes.push(childProcess.stdout.pipeTo(stdio.stdout, options));
-    if (stdio.stderr) pipes.push(childProcess.stderr.pipeTo(stdio.stderr, options));
-
-    const status = await childProcess.status;
-    abort.abort();
-    await Promise.allSettled(pipes);
-
-    return {
-      code: status.code,
-      stdout: "",
-      stderr: "",
-    };
-  } else {
-    const output = await childProcess.output();
-
-    return {
-      code: output.code,
-      stdout: new TextDecoder().decode(output.stdout),
-      stderr: new TextDecoder().decode(output.stderr),
-    };
-  }
-}
-
-async function spawnBunChildProcess(
-  command: string[],
-  extraEnvVars: Record<string, string> = {},
-  cwd?: string,
-  stdio?: StdIO,
-): Promise<SpawnResult> {
-  // @ts-ignore Bun is runtime specific
-  const childProcess = await Bun.spawn({
-    cmd: command,
-    // @ts-ignore process is runtime specific
-    env: { ...process.env, ...extraEnvVars }, // Merge environment variables
-    cwd,
-    stdin: stdio?.stdin === null ? null : "pipe",
-    stdout: stdio?.stdout === null ? null : "pipe",
-    stderr: stdio?.stderr === null ? null : "pipe",
-  });
-
-  if (stdio) {
-    if (stdio.stdin) stdio.stdin.pipeTo(childProcess.stdin);
-    if (stdio.stdout) childProcess.stdout.pipeTo(stdio.stdout);
-    if (stdio.stderr) childProcess.stderr.pipeTo(stdio.stderr);
-  }
-
-  // Convert ReadableStreams to strings
-  await childProcess.exited;
-
-  return {
-    code: childProcess.exitCode,
-    // @ts-ignore Bun is runtime specific
-    stdout: stdio ? "" : await Bun.readableStreamToText(childProcess.stdout),
-    // @ts-ignore Bun is runtime specific
-    stderr: stdio ? "" :await Bun.readableStreamToText(childProcess.stderr),
-  };
-}
-
 /**
  * Starts a child processes.
  *
  * @param {string[]} command - An array of strings representing the command and its arguments.
- * @param {Record<string, string>} [extraEnvVars] - An optional object containing additional environment variables to set for the command.
+ * @param {Record<string, string>} [env] - An optional object containing additional environment variables to set for the command.
  * @param {string} [cwd] - An optional path specifying the current working directory for the command.
  * @param {StdIO} [stdio] - An optional object specifying streams to use instead of buffering the output.
  * @returns {Promise<SpawnResult>} A Promise resolving with an object containing:
@@ -218,20 +85,58 @@ async function spawnBunChildProcess(
  *   console.error(error);
  * }
  */
-export async function spawn(
+export function spawn(
   command: string[],
-  extraEnvVars: Record<string, string> = {},
+  env: Record<string, string> = {},
   cwd?: string,
   stdio?: StdIO,
 ): Promise<SpawnResult> {
-  switch (CurrentRuntime) {
-    case Runtime.Node:
-      return await spawnNodeChildProcess(command, extraEnvVars, cwd, stdio);
-    case Runtime.Deno:
-      return await spawnDenoChildProcess(command, extraEnvVars, cwd, stdio);
-    case Runtime.Bun:
-      return await spawnBunChildProcess(command, extraEnvVars, cwd, stdio);
-    default:
-      throw new Error(`Unsupported runtime: ${CurrentRuntime}`);
+  let stdoutBuffer = "";
+  let stderrBuffer = "";
+
+  if (!stdio) {
+    stdio = {
+      stdin: null,
+      stdout: new WritableStream({
+        write(chunk) {stdoutBuffer += chunk.toString()},
+      }),
+      stderr: new WritableStream({
+        write(chunk) {stderrBuffer += chunk.toString()},
+      }),
+    }
   }
+
+  const stdio_node: ("pipe" | "ignore")[] = [
+    stdio.stdin ? "pipe" : "ignore",
+    stdio.stdout ? "pipe" : "ignore",
+    stdio.stderr ? "pipe" : "ignore"
+  ];
+
+  const childProcess = spawnChild(
+    command[0],
+    command.length > 1 ? command.slice(1) : [],
+    {
+      env: { ...process.env, ...env },
+      cwd: cwd,
+      shell: false,
+      stdio: stdio_node,
+    },
+  );
+
+  console.log(Readable.fromWeb, Writable.fromWeb)
+
+  // @ts-ignore Node's types here are weird
+  if (stdio.stdin) Readable.fromWeb(stdio.stdin).pipe(childProcess.stdin);
+  // @ts-ignore Node's types here are weird
+  if (stdio.stdout) childProcess.stdout.pipe(Writable.fromWeb(stdio.stdout));
+  // @ts-ignore Node's types here are weird
+  if (stdio.stderr) childProcess.stderr.pipe(Writable.fromWeb(stdio.stderr));
+
+  return new Promise((resolve, reject) => { // Still need Promise here due to event listeners
+    childProcess.on("error", (error: Error) => reject(error));
+    childProcess.on(
+      "close",
+      (code: number) => resolve({ code, stdout: stdoutBuffer, stderr: stderrBuffer }),
+    );
+  });
 }

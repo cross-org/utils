@@ -52,31 +52,28 @@ async function spawnNodeChildProcess(
   const { spawn } = await import("node:child_process");
 
   // Node has its own stream types
-  const { Readable, Writable, PassThrough } = await import("node:stream");
-
-  // Node doesn't seem to have any types for streams
-  // deno-lint-ignore no-explicit-any
-  let stdio_node: any[]
+  const { Readable, Writable } = await import("node:stream");
 
   let stdoutBuffer = "";
   let stderrBuffer = "";
 
-  if (stdio) {
-    stdio_node = [
-      // @ts-ignore Node is a bit funny with types here
-      stdio.stdin ? Readable.fromWeb(stdio.stdin) : "ignore",
-      stdio.stdout ? Writable.fromWeb(stdio.stdout) : "ignore",
-      stdio.stderr ? Writable.fromWeb(stdio.stderr) : "ignore",
-    ];
-  } else {
-    const stdout = new PassThrough();
-    const stderr = new PassThrough();
-
-    stdio_node = ["ignore", stdout, stderr];
-
-    stdout.on("data", (data: string) => stdoutBuffer += data.toString());
-    stderr.on("data", (data: string) => stderrBuffer += data.toString());
+  if (!stdio) {
+    stdio = {
+      stdin: null,
+      stdout: new WritableStream({
+        write(chunk) {stdoutBuffer += chunk.toString()}
+      }),
+      stderr: new WritableStream({
+        write(chunk) {stderrBuffer += chunk.toString()}
+      }),
+    }
   }
+
+  const stdio_node: ("pipe" | "ignore")[] = [
+    stdio.stdin ? "pipe" : "ignore",
+    stdio.stdout ? "pipe" : "ignore",
+    stdio.stderr ? "pipe" : "ignore"
+  ];
 
   const childProcess = spawn(
     command[0],
@@ -85,9 +82,16 @@ async function spawnNodeChildProcess(
       env: { ...process.env, ...env },
       cwd: cwd,
       shell: false,
-      stdio: stdio_node
+      stdio: stdio_node,
     },
   );
+
+  // @ts-ignore Node's types here are weird
+  if (stdio.stdin) Readable.fromWeb(stdio.stdin).pipe(childProcess.stdin);
+  // @ts-ignore Node's types here are weird
+  if (stdio.stdout) childProcess.stdout.pipe(Writable.fromWeb(stdio.stdout));
+  // @ts-ignore Node's types here are weird
+  if (stdio.stderr) childProcess.stderr.pipe(Writable.fromWeb(stdio.stderr));
 
   return new Promise((resolve, reject) => { // Still need Promise here due to event listeners
     childProcess.on("error", (error: Error) => reject(error));

@@ -14,6 +14,6 @@ if (CurrentRuntime === Runtime.Bun) {
   }
 }
 
-export const stdin = () => Readable.toWeb(process.stdin);
+export const stdin = () => (Readable.toWeb(process.stdin) as ReadableStream);
 export const stdout = () => Writable.toWeb(process.stdout);
 export const stderr = () => Writable.toWeb(process.stderr);

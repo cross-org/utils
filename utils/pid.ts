@@ -1,4 +1,5 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
+import process from "node:process";
 
 /**
  * Return the current process pid in a cross-runtime compatible manner.

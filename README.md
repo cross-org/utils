@@ -35,7 +35,8 @@ bunx jsr add @cross/utils
 - **stripAnsi(text: string): string**
   - Removes all ANSI control codes from a string for cleaner logs and output.
 
-- **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string)**
+- **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string, stdio:
+  StdIO)**
   - Spawns a sub process.
 
 - **table(data: string[][])**
@@ -58,12 +59,22 @@ bunx jsr add @cross/utils
     any modifications to the object's properties.
   - If `createCopy` is `true` (default is `false`), a new frozen deep copy of
     the object is returned, leaving the original unchanged.
+
 - **deepSeal<T>(obj: T, createCopy?: boolean): T**
   - Recursively seals an object and all its nested objects. Sealing prevents new
     properties from being added or removed, but existing properties can still be
     modified.
   - If `createCopy` is `true` (default is `false`), a new sealed deep copy of
     the object is returned, leaving the original unchanged.
+
+- **stdin(): ReadableStream**
+  - Get the stdin as a web-standard `ReadableStream` object.
+
+- **stdout(): WritableStream**
+  - Get the stdout as a web-standard `WritableStream` object.
+
+- **stderr(): WritableStream**
+  - Get the stderr as a web-standard `WritableStream` object.
 
 **Classes**
 
@@ -126,8 +137,8 @@ functionality:
   - **Colors Class** - Provides methods for easy console text styling.
 
 - **@cross/utils/spawn**
-  - **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string):
-    Promise<>** - Spawns subprocesses in a cross-runtime manner.
+  - **spawn(command: CommandArray, extraEnvVars?: Object, cwd?: string, stdio:
+    StdIO): Promise<>** - Spawns subprocesses in a cross-runtime manner.
 
 - **@cross/utils/args**
   - **args(all?: boolean): string[]** - Fetches command-line arguments
@@ -139,7 +150,7 @@ functionality:
   - **exit(code?: number): void** - Terminates the process with control over the
     exit code.
 
-* **@cross/utils/format**
+- **@cross/utils/format**
   - **table(data: string[][]): void** - Generates a neatly formatted table
     representation of a 2D array and prints it to the console.
     - **Parameter:**
@@ -211,3 +222,11 @@ functionality:
   sealedCopy.w = 7; // Throws an error in strict mode
   original.w = 20; // Succeeds, original is unchanged
   ```
+
+- **@cross/utils/stdio**
+  - **stdin(): ReadableStream**
+    - Get the stdin as a web-standard `ReadableStream` object.
+  - **stdout(): WritableStream**
+    - Get the stdout as a web-standard `WritableStream` object.
+  - **stderr(): WritableStream**
+    - Get the stderr as a web-standard `WritableStream` object.

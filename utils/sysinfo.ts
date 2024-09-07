@@ -1,5 +1,6 @@
 import { CurrentRuntime, Runtime } from "@cross/runtime";
 import { freemem, loadavg, totalmem, uptime as nodeUptime } from "node:os";
+import process from "node:process";
 
 /**
  * Provides information about the memory usage of the current process.

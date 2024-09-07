@@ -109,27 +109,48 @@ async function spawnDenoChildProcess(
     args: command.length > 1 ? command.slice(1) : [],
     env: { ...env },
     cwd,
-    stdin: stdio?.stdin === null ? "null" : undefined,
-    stdout: stdio?.stdout === null ? "null" : undefined,
-    stderr: stdio?.stderr === null ? "null" : undefined,
+    stdin: stdio?.stdin === null ? "null" : "piped",
+    stdout: stdio?.stdout === null ? "null" : "piped",
+    stderr: stdio?.stderr === null ? "null" : "piped",
   };
 
   const cmd = new Deno.Command(command[0], options);
   const childProcess = cmd.spawn();
 
   if (stdio) {
-    if (stdio.stdin) stdio.stdin.pipeTo(childProcess.stdin);
-    if (stdio.stdout) childProcess.stdout.pipeTo(stdio.stdout);
-    if (stdio.stderr) childProcess.stderr.pipeTo(stdio.stderr);
+    const abort = new AbortController();
+
+    const options = {
+      signal: abort.signal,
+      preventAbort: true,
+      preventCancel: true,
+      preventClose: true,
+    };
+
+    const pipes: Promise<void>[] = []
+
+    if (stdio.stdin) pipes.push(stdio.stdin.pipeTo(childProcess.stdin, options));
+    if (stdio.stdout) pipes.push(childProcess.stdout.pipeTo(stdio.stdout, options));
+    if (stdio.stderr) pipes.push(childProcess.stderr.pipeTo(stdio.stderr, options));
+
+    const status = await childProcess.status;
+    abort.abort();
+    await Promise.allSettled(pipes);
+
+    return {
+      code: status.code,
+      stdout: "",
+      stderr: "",
+    };
+  } else {
+    const output = await childProcess.output();
+
+    return {
+      code: output.code,
+      stdout: new TextDecoder().decode(output.stdout),
+      stderr: new TextDecoder().decode(output.stderr),
+    };
   }
-
-  const output = await childProcess.output()
-
-  return {
-    code: output.code,
-    stdout: stdio ? "" : new TextDecoder().decode(output.stdout),
-    stderr: stdio ? "" : new TextDecoder().decode(output.stderr),
-  };
 }
 
 async function spawnBunChildProcess(

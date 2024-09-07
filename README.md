@@ -58,12 +58,22 @@ bunx jsr add @cross/utils
     any modifications to the object's properties.
   - If `createCopy` is `true` (default is `false`), a new frozen deep copy of
     the object is returned, leaving the original unchanged.
+
 - **deepSeal<T>(obj: T, createCopy?: boolean): T**
   - Recursively seals an object and all its nested objects. Sealing prevents new
     properties from being added or removed, but existing properties can still be
     modified.
   - If `createCopy` is `true` (default is `false`), a new sealed deep copy of
     the object is returned, leaving the original unchanged.
+
+- **stdin(): ReadableStream**
+  - Get the stdin as a web-standard `ReadableStream` object.
+
+- **stdout(): WritableStream**
+  - Get the stdout as a web-standard `WritableStream` object.
+
+- **stderr(): WritableStream**
+  - Get the stderr as a web-standard `WritableStream` object.
 
 **Classes**
 

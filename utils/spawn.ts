@@ -7,7 +7,7 @@ import process from "node:process";
 
 if (CurrentRuntime === Runtime.Bun) {
   // Bun has a bug in Writable.fromWeb, so polyfill
-  Writable.fromWeb = (writableStream: WritableStream) => {
+  Writable.fromWeb = (writableStream) => {
     const writer = writableStream.getWriter();
 
     return new Writable({

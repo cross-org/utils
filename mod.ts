@@ -14,3 +14,4 @@ export {
   uptime,
 } from "./utils/sysinfo.ts";
 export { deepFreeze, deepSeal } from "./utils/objectManip.ts";
+export { stdin, stdout, stderr } from "./utils/stdio.ts";

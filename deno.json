@@ -11,7 +11,8 @@
     "./table": "./utils/table.ts",
     "./execpath": "./utils/execpath.ts",
     "./sysinfo": "./utils/sysinfo.ts",
-    "./objectManip": "./utils/objectManip.ts"
+    "./objectManip": "./utils/objectManip.ts",
+    "./stdio": "./utils/stdio.ts"
   },
   "imports": {
     "@cross/fs": "jsr:@cross/fs@^0.1.11",

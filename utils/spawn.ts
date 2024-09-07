@@ -46,17 +46,17 @@ export interface StdIO {
   /**
    * The input into the spawned process.
    */
-  stdin: ReadableStream | null;
+  stdin: ReadableStream | "inherit" | null;
 
   /**
    * The output from the spawned process.
    */
-  stdout: WritableStream | null;
+  stdout: WritableStream | "inherit" | null;
 
   /**
    * The errors from the spawned process.
    */
-  stderr: WritableStream | null;
+  stderr: WritableStream | "inherit" | null;
 }
 
 /**
@@ -106,10 +106,10 @@ export function spawn(
     }
   }
 
-  const stdio_node: ("pipe" | "ignore")[] = [
-    stdio.stdin ? "pipe" : "ignore",
-    stdio.stdout ? "pipe" : "ignore",
-    stdio.stderr ? "pipe" : "ignore"
+  const stdio_node: ("pipe" | "inherit" | "ignore")[] = [
+    stdio.stdin === "inherit" ? "inherit" : stdio.stdin ? "pipe" : "ignore",
+    stdio.stdout === "inherit" ? "inherit" : stdio.stdout ? "pipe" : "ignore",
+    stdio.stderr === "inherit" ? "inherit" : stdio.stderr ? "pipe" : "ignore"
   ];
 
   const childProcess = spawnChild(
@@ -124,11 +124,11 @@ export function spawn(
   );
 
   // @ts-ignore Node's types here are weird
-  if (stdio.stdin) Readable.fromWeb(stdio.stdin).pipe(childProcess.stdin, { end: false });
+  if (stdio.stdin instanceof ReadableStream) Readable.fromWeb(stdio.stdin).pipe(childProcess.stdin, { end: false });
   // @ts-ignore Node's types here are weird
-  if (stdio.stdout) childProcess.stdout.pipe(Writable.fromWeb(stdio.stdout), { end: false });
+  if (stdio.stdout instanceof WritableStream) childProcess.stdout.pipe(Writable.fromWeb(stdio.stdout), { end: false });
   // @ts-ignore Node's types here are weird
-  if (stdio.stderr) childProcess.stderr.pipe(Writable.fromWeb(stdio.stderr), { end: false });
+  if (stdio.stderr instanceof WritableStream) childProcess.stderr.pipe(Writable.fromWeb(stdio.stderr), { end: false });
 
   return new Promise((resolve, reject) => { // Still need Promise here due to event listeners
     childProcess.on("error", (error: Error) => reject(error));

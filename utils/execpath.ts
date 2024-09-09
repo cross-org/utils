@@ -6,22 +6,20 @@ import process from "node:process";
  * Cross-runtime compatible way to return the current executable path in a  manner, regardless of Node, Deno or Bun.
  *
  * @returns {string} The current working directory path.
- * @throws
+ * @throws {Error} If the runtime executable cannot be found from the runtime.
  * @example
  * // import { execPath } from "@cross/utils";
  *
  * const currentExecPath = execPath();
  * console.log("The path to the current runtime executable is :", currentExecPath);
  */
-export function execPath(): Promise<string> {
+export function execPath(): string {
   if (CurrentRuntime === Runtime.Deno) {
-    //@ts-ignore cross-runtime
     return Deno.execPath();
   } else if (
     CurrentRuntime === Runtime.Node || CurrentRuntime === Runtime.Bun
   ) {
-    //@ts-ignore cross-runtime
-    return process.execPath();
+    return process.execPath;
   } else {
     throw new Error(
       `Cannot determine execPath using current runtime ('${CurrentRuntime}').`,
@@ -49,7 +47,6 @@ export async function resolvedExecPath(): Promise<string> {
     if (foundDeno !== null) {
       return foundDeno;
     } else {
-      //@ts-ignore cross-runtime
       return Deno.execPath();
     }
   } else if (CurrentRuntime === Runtime.Node) {
@@ -57,16 +54,14 @@ export async function resolvedExecPath(): Promise<string> {
     if (foundNode !== null) {
       return foundNode;
     } else {
-      //@ts-ignore cross-runtime
-      return process.execPath();
+      return process.execPath;
     }
   } else if (CurrentRuntime === Runtime.Bun) {
     const foundBun = await which("bun");
     if (foundBun !== null) {
       return foundBun;
     } else {
-      //@ts-ignore cross-runtime
-      return process.execPath();
+      return process.execPath;
     }
   } else {
     throw new Error(

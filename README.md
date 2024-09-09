@@ -166,7 +166,7 @@ functionality:
       table(myData);
       ```
 
-- **execPath(): Promise<string>**
+- **execPath(): string**
   - Returns the actual path to the current runtime executable.
   - **Examples:**
   ```javascript
